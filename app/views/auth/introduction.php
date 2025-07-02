@@ -356,7 +356,6 @@ if (!isset($_SESSION['user'])) {
         border: none;
         height: 2px;
         background-color: #ccc;
-        /* hoặc #e0e0e0 cho nhẹ hơn */
         margin: 20px 0;
         position: relative;
         top: 125px;

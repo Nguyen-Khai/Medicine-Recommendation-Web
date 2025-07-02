@@ -207,6 +207,29 @@
         transform: scale(1.02);
     }
 
+    #suggestions {
+        border: 1px solid #ccc;
+        max-height: 200px;
+        overflow-y: auto;
+        position: relative;
+        top: 21px;
+        background-color: white;
+        z-index: 1000;
+        width: 100%;
+        border-radius: 4px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    #suggestions div {
+        padding: 10px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    #suggestions div:hover {
+        background-color: #f0f0f0;
+    }
+
     /*Avatar*/
     .avatar-dropdown {
         position: relative;
@@ -297,11 +320,12 @@
         <!-- Sidebar tìm kiếm -->
         <div id="searchSidebar" class="search-sidebar">
             <button id="closeSearchBtn" class="close-btn">&times;</button>
-            <input type="text" placeholder="Nhập từ khóa tìm kiếm..." />
+            <input type="text" id="searchInput" placeholder="Nhập từ khóa tìm kiếm..." autocomplete="off" />
+            <div id="suggestions" class="autocomplete-box"></div>
             <button class="search">Tìm kiếm</button>
         </div>
         <div class="avatar-dropdown">
-            <img src="assets/images/avatar.png" alt="Avatar" class="avatar" onclick="toggleDropdown()">
+            <img src="" alt="Avatar" class="avatar" onclick="toggleDropdown()">
             <div class="dropdown-menu" id="dropdown-menu">
                 <a href="index.php?route=profile">Thông tin cá nhân</a>
                 <a href="#" onclick="logout()">Đăng xuất</a>
@@ -353,5 +377,49 @@
 
     closeBtn.addEventListener('click', () => {
         sidebar.classList.remove('open');
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const input = document.getElementById('searchInput');
+        const box = document.getElementById('suggestions');
+
+        input.addEventListener('input', function() {
+            const keyword = input.value.trim();
+
+            if (keyword.length < 2) {
+                box.style.display = 'none';
+                return;
+            }
+
+            // 🔄 Sửa tại đây
+            fetch(`index.php?route=autocomplete&query=${encodeURIComponent(keyword)}`)
+                .then(res => res.json())
+                .then(data => {
+                    box.innerHTML = '';
+                    if (data.length === 0) {
+                        box.style.display = 'none';
+                        return;
+                    }
+
+                    data.forEach(item => {
+                        const div = document.createElement('div');
+                        div.textContent = item;
+                        div.addEventListener('click', () => {
+                            input.value = item;
+                            box.style.display = 'none';
+                        });
+                        box.appendChild(div);
+                    });
+
+                    box.style.display = 'block';
+                });
+        });
+    });
+
+    document.querySelector('.search').addEventListener('click', function() {
+        const keyword = document.getElementById('searchInput').value.trim();
+        if (keyword.length > 0) {
+            window.location.href = `index.php?route=search&query=${encodeURIComponent(keyword)}`;
+        }
     });
 </script>

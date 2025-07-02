@@ -19,7 +19,7 @@ switch ($route) {
         break;
 
     case 'medicine_cabinet':
-        include '../app/views/auth/medicine_cabinet.php';
+        $diseaseController->renderMedicineCabinet(); // ← gọi controller thay vì chỉ include
         break;
 
     case 'recommendation':
@@ -54,6 +54,14 @@ switch ($route) {
 
     case 'diagnose':
         $diseaseController->diagnose();
+        break;
+
+    case 'autocomplete':
+        $diseaseController->searchSuggestions();
+        break;
+        
+    case 'search':
+        $diseaseController->search();
         break;
 
     default:

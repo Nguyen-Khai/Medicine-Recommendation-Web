@@ -138,7 +138,7 @@ if (!isset($_SESSION['user'])) {
 
     .medicine-table a {
         color: #0D92F4;
-        text-decoration: underline;
+        text-decoration: none;
     }
 
     .medicine-table a:hover {
@@ -163,7 +163,7 @@ if (!isset($_SESSION['user'])) {
 
 <body>
     <?php
-        include('header.php')
+    include('header.php')
     ?>
     <!-- Nội dung chính -->
     <div class="result">
@@ -237,7 +237,7 @@ if (!isset($_SESSION['user'])) {
                         <thead>
                             <tr>
                                 <th>Tên/ Thành phần thuốc</th>
-                                <th>Tìm kiếm sản phẩm</th>
+                                <th>Tìm hiểu thêm</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -248,6 +248,34 @@ if (!isset($_SESSION['user'])) {
                                         <a href="https://www.google.com/search?q=<?= urlencode(trim($med)) ?>" target="_blank">
                                             Tìm kiếm ngay
                                         </a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
+            <?php if (!empty($matchingDrugs)): ?>
+                <div class="result-section">
+                    <img class="result" src="https://img.icons8.com/?size=100&id=9shlfoGKqCS7&format=png&color=000000" alt="Các loại thuốc có trong HealMate">
+                    <h2>Các loại thuốc có ở HealMate:</h2>
+                    <table class="medicine-table">
+                        <thead>
+                            <tr>
+                                <th>Tên thuốc</th>
+                                <th>Thành phần</th>
+                                <th>Hàm lượng</th>
+                                <th>Xem chi tiết</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($matchingDrugs as $drug): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($drug['ten_thuoc']) ?></td>
+                                    <td><?= htmlspecialchars($drug['ten_hoat_chat']) ?></td>
+                                    <td><?= htmlspecialchars($drug['ham_luong']) ?></td>
+                                    <td>
+                                        <a href="<?= htmlspecialchars($drug['url']) ?>" target="_blank">Xem</a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

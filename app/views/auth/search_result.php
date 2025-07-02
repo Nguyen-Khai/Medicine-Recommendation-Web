@@ -11,7 +11,7 @@ if (!isset($_SESSION['user'])) {
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tủ thuốc</title>
+    <title>Kết quả tìm kiếm</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather&display=swap">
     <style>
         body {
@@ -110,7 +110,6 @@ if (!isset($_SESSION['user'])) {
             color: #0056b3;
         }
 
-        /*Background*/
         .circle {
             position: absolute;
             border-radius: 50%;
@@ -143,7 +142,6 @@ if (!isset($_SESSION['user'])) {
             }
         }
 
-        /* Mỗi vòng tròn có kích thước và vị trí khác nhau */
         .circle1 {
             width: 150px;
             height: 150px;
@@ -178,18 +176,17 @@ if (!isset($_SESSION['user'])) {
 
 <body>
     <?php
-    include('header.php')
+    include('header.php');
     ?>
-    <!-- Nội dung chính -->
     <div class="circle circle1"></div>
     <div class="circle circle2"></div>
     <div class="circle circle3"></div>
     <div class="circle circle4"></div>
     <div class="section">
-        <h2 class="st2-title">Tủ thuốc của HEALMATE</h2>
-        <?php if (!empty($medicines)): ?>
+        <h2 class="st2-title">Kết quả tìm kiếm cho: "<?= htmlspecialchars($keyword) ?>"</h2>
+        <?php if (!empty($results)): ?>
             <ul id="article-list">
-                <?php foreach ($medicines as $med): ?>
+                <?php foreach ($results as $med): ?>
                     <li class="article-item">
                         <div class="health-article">
                             <h3 class="article-title"><?= htmlspecialchars($med['ten_thuoc']) ?></h3>
@@ -203,11 +200,10 @@ if (!isset($_SESSION['user'])) {
                 <?php endforeach; ?>
             </ul>
         <?php else: ?>
-            <p>Không có thuốc nào trong hệ thống.</p>
+            <p>Không tìm thấy thuốc hoặc hoạt chất nào phù hợp.</p>
         <?php endif; ?>
-        <div id="pagination" class="pagination-controls"></div>
+        <div id="pagination"></div>
     </div>
-
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const itemsPerPage = 8;
@@ -231,15 +227,11 @@ if (!isset($_SESSION['user'])) {
                 const totalPages = Math.ceil(articleList.length / itemsPerPage);
                 paginationContainer.innerHTML = '';
 
-                // Nút <<
                 if (currentPage > 1) {
-                    const firstBtn = createNavButton('<<', 1);
-                    const prevBtn = createNavButton('<', currentPage - 1);
-                    paginationContainer.appendChild(firstBtn);
-                    paginationContainer.appendChild(prevBtn);
+                    paginationContainer.appendChild(createNavButton('<<', 1));
+                    paginationContainer.appendChild(createNavButton('<', currentPage - 1));
                 }
 
-                // Các nút số
                 const start = Math.max(1, currentPage - 1);
                 const end = Math.min(totalPages, currentPage + 1);
 
@@ -249,7 +241,6 @@ if (!isset($_SESSION['user'])) {
                     paginationContainer.appendChild(btn);
                 }
 
-                // Hiện trang cuối cùng nếu cách xa
                 if (end < totalPages - 1) {
                     const dots = document.createElement('span');
                     dots.textContent = '...';
@@ -257,16 +248,12 @@ if (!isset($_SESSION['user'])) {
                 }
 
                 if (end < totalPages) {
-                    const lastBtn = createNavButton(totalPages, totalPages);
-                    paginationContainer.appendChild(lastBtn);
+                    paginationContainer.appendChild(createNavButton(totalPages, totalPages));
                 }
 
-                // Nút >>
                 if (currentPage < totalPages) {
-                    const nextBtn = createNavButton('>', currentPage + 1);
-                    const lastBtn = createNavButton('>>', totalPages);
-                    paginationContainer.appendChild(nextBtn);
-                    paginationContainer.appendChild(lastBtn);
+                    paginationContainer.appendChild(createNavButton('>', currentPage + 1));
+                    paginationContainer.appendChild(createNavButton('>>', totalPages));
                 }
             }
 
