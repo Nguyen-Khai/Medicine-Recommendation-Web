@@ -1,4 +1,5 @@
 <?php
+session_start();  // <- THÊM DÒNG NÀY
 require_once '../app/models/DiseaseModel.php';
 
 class DiseaseController
@@ -13,47 +14,50 @@ class DiseaseController
     public function diagnose()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Chuẩn hoá dữ liệu người dùng nhập
+            // Chuẩn hoá triệu chứng
             $raw_input = $_POST['symptoms'] ?? '';
-            $input_symptoms = strtolower(trim($raw_input));
+            $input_symptoms = str_replace(' ', '_', strtolower(trim($raw_input)));
             $input_symptoms = preg_replace('/\s*,\s*/', ',', $input_symptoms);
+            $enteredSymptoms = array_filter(array_map('trim', explode(',', $input_symptoms)));
 
-            // ✅ Thay dấu cách bằng gạch dưới (skin rash → skin_rash)
-            $input_symptoms = str_replace(' ', '_', $input_symptoms);
-
-            $enteredSymptoms = explode(',', $input_symptoms);
-
-
-            // Đường dẫn tuyệt đối
-            $pythonPath  = 'C:\Users\Admin\AppData\Local\Programs\Python\Python311\python.exe';
-            $scriptPath  = 'C:\xampp\htdocs\disease_diagnosis_system\ml\predict.py';
-            $command     = "\"$pythonPath\" \"$scriptPath\" " . escapeshellarg($input_symptoms);
-
-            // Gọi mô hình
-            $command .= " 2>&1";  // Gom cả lỗi (stderr) vào kết quả
+            // Gọi mô hình Python
+            $pythonPath = 'C:\Users\Admin\AppData\Local\Programs\Python\Python311\python.exe';
+            $scriptPath = 'C:\xampp\htdocs\disease_diagnosis_system\ml\predict.py';
+            $command = "\"$pythonPath\" \"$scriptPath\" " . escapeshellarg($input_symptoms) . " 2>&1";
             $output = shell_exec($command);
 
-            // Phân tích kết quả JSON
             $data = json_decode($output, true);
             $diseaseName = $data['disease'] ?? 'Không xác định';
 
-            // Truy vấn MySQL
-            $enteredSymptoms = array_map('trim', explode(',', $input_symptoms));
-            $enteredSymptoms = array_filter($enteredSymptoms); // loại bỏ chuỗi rỗng nếu có
-
-
-            // Lấy thông tin bệnh
+            // Truy vấn chi tiết bệnh
             $diseaseInfo = $this->model->getDiseaseDetails($diseaseName);
 
-            // Tách danh sách thuốc gợi ý (có thể là chuỗi hoặc mảng)
-            $raw = $diseaseInfo['medication'];
-            $clean = str_replace(["[", "]", "'", '"', "_"], '', $raw);
-            $medications = array_filter(array_map('trim', explode(',', $clean)));
+            // Gợi ý thuốc
+            $medications = [];
+            if (!empty($diseaseInfo['medication'])) {
+                $clean = str_replace(["[", "]", "'", '"', "_"], '', $diseaseInfo['medication']);
+                $medications = array_filter(array_map('trim', explode(',', $clean)));
+            }
 
-            // Tìm thuốc phù hợp từ bảng DrugBank
+            // Lưu lịch sử người dùng
+            $userId = $_SESSION['user']['id'] ?? null;
+            if ($userId && $diseaseInfo) {
+                $this->model->saveUserHistory([
+                    'user_id' => $userId,
+                    'symptoms' => implode(', ', $enteredSymptoms),
+                    'disease' => $diseaseInfo['disease'],
+                    'description' => $diseaseInfo['description'],
+                    'medications' => implode(', ', $medications),
+                    'diet' => $diseaseInfo['diet'] ?? '',
+                    'workouts' => implode('| ', $diseaseInfo['workouts'] ?? []),
+                    'precautions' => implode('| ', $diseaseInfo['precautions'] ?? [])
+                ]);
+            }
+
+            // Thuốc trong hệ thống
             $matchingDrugs = $this->model->findDrugsByIngredients($medications);
 
-            // Lấy trọng số các triệu chứng người dùng nhập
+            // Trọng số triệu chứng
             $symptomWeights = $this->model->getSymptomWeights($enteredSymptoms);
 
             // Gửi sang view
@@ -62,41 +66,81 @@ class DiseaseController
             require '../app/views/auth/form.php';
         }
     }
+
     public function renderMedicineCabinet()
     {
-        // Lấy toàn bộ danh sách thuốc từ CSDL
         $medicines = $this->model->getAllDrugArticles();
-
-        // Gửi dữ liệu tới view tủ thuốc
         require '../app/views/auth/medicine_cabinet.php';
     }
 
     public function searchSuggestions()
     {
-        // Kiểm tra có tham số query không
         $term = $_GET['query'] ?? '';
-        if (trim($term) === '') {
-            echo json_encode([]);
-            return;
-        }
-
-        // Gọi model để lấy gợi ý
-        $suggestions = $this->model->searchDrugSuggestions($term);
-
-        header('Content-Type: application/json');
-        echo json_encode($suggestions);
+        echo json_encode($term !== '' ? $this->model->searchDrugSuggestions($term) : []);
     }
 
     public function search()
     {
-        $keyword = $_GET['query'] ?? '';
-        $keyword = trim($keyword);
+        $keyword = trim($_GET['query'] ?? '');
+        $results = $keyword !== '' ? $this->model->searchDrugsWithDetails($keyword) : [];
+        require '../app/views/auth/search_result.php';
+    }
 
-        $results = [];
-        if ($keyword !== '') {
-            $results = $this->model->searchDrugsWithDetails($keyword);
+    // Hiển thị lịch sử người dùng
+    public function profile()
+    {
+        $userId = $_SESSION['user']['id'] ?? null;
+
+        if (!$userId) {
+            header("Location: index.php?route=login");
+            exit();
         }
 
-        require '../app/views/auth/search_result.php';
+        $userHistories = $this->model->getUserHistory($userId); // gọi model
+
+        require '../app/views/auth/profile.php';
+    }
+
+    public function historyDetail()
+    {
+        if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+            echo "ID không hợp lệ.";
+            return;
+        }
+
+        $historyId = $_GET['id'];
+        $userId = $_SESSION['user']['id'] ?? null;
+
+        if (!$userId) {
+            echo "Không xác định người dùng.";
+            return;
+        }
+
+        $history = $this->model->getUserHistoryById($historyId);
+
+        if (!$history || $history['user_id'] != $userId) {
+            echo "Không tìm thấy lịch sử.";
+            return;
+        }
+
+        // Chuẩn bị biến tương thích với history.php
+        $enteredSymptoms = explode(',', $history['symptoms']);
+        $diseaseName = $history['predicted_disease'];
+        $diseaseInfo = [
+            'description' => $history['description'],
+            'medication' => $history['medications'],
+            'diet' => $history['diet'],
+            'workouts' => explode('| ', $history['workouts']),
+            'precautions' => explode('| ', $history['precautions']),
+        ];
+
+        // Giả lập $symptomWeights nếu muốn (không bắt buộc)
+        $symptomWeights = [];
+
+        // Tìm thuốc từ hệ thống
+        $keywords = array_filter(array_map('trim', explode(',', $history['medications'])));
+        $matchingDrugs = $this->model->findDrugsByIngredients($keywords);
+
+        require '../app/views/auth/history.php';
     }
 }

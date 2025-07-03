@@ -3,6 +3,9 @@ if (!isset($_SESSION['user'])) {
     header("Location: index.php?route=login");
     exit();
 }
+
+require_once '../app/models/DiseaseModel.php';
+$model = new DiseaseModel();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -169,66 +172,45 @@ if (!isset($_SESSION['user'])) {
         <div class="result-container">
             <div class="result-section">
                 <img class="result" src="https://img.icons8.com/?size=100&id=uACqhDVXGkr6&format=png&color=000000" alt="">
-                <h2> Những triệu chứng bạn đã nhập:</h2>
+                <h2>Những triệu chứng bạn đã nhập:</h2>
                 <?php if (!empty($enteredSymptoms)): ?>
                     <p><?= implode(', ', array_map('htmlspecialchars', $enteredSymptoms)) ?></p>
                 <?php endif; ?>
             </div>
 
-            <h1> Đây là lời tư vấn của chúng tôi</h1>
+            <h1>Đây là kết quả tư vấn từ HEALMATE</h1>
 
             <div class="result-section">
                 <img class="result" src="https://img.icons8.com/?size=100&id=eStKiCvjHOv8&format=png&color=000000" alt="">
-                <h2> Tên bệnh:</h2>
+                <h2>Tên bệnh:</h2>
                 <p><?= htmlspecialchars($diseaseName) ?></p>
             </div>
 
             <div class="result-section">
                 <img class="result" src="https://img.icons8.com/?size=100&id=g84XLRTaYw1k&format=png&color=000000" alt="">
-                <h2> Mô tả bệnh:</h2>
-                <p><?= $diseaseInfo['description'] ?></p>
+                <h2>Mô tả bệnh:</h2>
+                <p><?= htmlspecialchars($diseaseInfo['description']) ?></p>
             </div>
 
-            <div class="result-section">
-                <img class="result" src="https://img.icons8.com/?size=100&id=GFZarxtFIkhx&format=png&color=000000" alt="">
-                <h2> Mức độ nghiêm trọng:</h2>
-                <?php if (!empty($symptomWeights)): ?>
-                    <table class="symptomweights">
-                        <tr>
-                            <th>Triệu chứng</th>
-                            <th>Trọng số (Trên thang 10)</th>
-                        </tr>
-                        <?php foreach ($symptomWeights as $row): ?>
-                            <tr>
-                                <td><?= htmlspecialchars($row['symptom']) ?></td>
-                                <td><?= htmlspecialchars($row['weight']) ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </table>
-                <?php endif; ?>
-            </div>
-
-            <div class="result-section">
-                <img class="result" src="https://img.icons8.com/?size=100&id=TdgoFB7uKPlI&format=png&color=000000" alt="Phòng ngừa">
-                <h2>Các biện pháp phòng ngừa:</h2>
-                <?php if (!empty($diseaseInfo['precautions'])): ?>
+            <?php if (!empty($diseaseInfo['precautions'])): ?>
+                <div class="result-section">
+                    <img class="result" src="https://img.icons8.com/?size=100&id=TdgoFB7uKPlI&format=png&color=000000" alt="Phòng ngừa">
+                    <h2>Các biện pháp phòng ngừa:</h2>
                     <ul>
                         <?php foreach ($diseaseInfo['precautions'] as $p): ?>
                             <li><?= htmlspecialchars($p) ?></li>
                         <?php endforeach; ?>
                     </ul>
-                <?php endif; ?>
-            </div>
-            <?php if (!empty($diseaseInfo['medication'])): ?>
-                <?php
-                //Làm sạch
-                $raw = $diseaseInfo['medication'];
-                // Xoá các ký tự không mong muốn
-                $clean = str_replace(["[", "]", "'", '"', "_"], '', $raw);
-                // Tách thành mảng
-                $medications = explode(',', $clean);
-                ?>
+                </div>
+            <?php endif; ?>
 
+            <?php
+            $raw = $diseaseInfo['medication'] ?? '';
+            $clean = str_replace(["[", "]", "'", '"', "_"], '', $raw);
+            $medications = array_filter(array_map('trim', explode(',', $clean)));
+            ?>
+
+            <?php if (!empty($medications)): ?>
                 <div class="result-section">
                     <img class="result" src="https://img.icons8.com/?size=100&id=byMfPQ4nQ4lQ&format=png&color=000000" alt="Thuốc đề xuất">
                     <h2>Các loại thuốc được gợi ý:</h2>
@@ -242,11 +224,9 @@ if (!isset($_SESSION['user'])) {
                         <tbody>
                             <?php foreach ($medications as $med): ?>
                                 <tr>
-                                    <td><?= htmlspecialchars(trim($med)) ?></td>
+                                    <td><?= htmlspecialchars($med) ?></td>
                                     <td>
-                                        <a href="https://www.google.com/search?q=<?= urlencode(trim($med)) ?>" target="_blank">
-                                            Tìm kiếm ngay
-                                        </a>
+                                        <a href="https://www.google.com/search?q=<?= urlencode($med) ?>" target="_blank">Tìm kiếm ngay</a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -254,6 +234,7 @@ if (!isset($_SESSION['user'])) {
                     </table>
                 </div>
             <?php endif; ?>
+
             <?php if (!empty($matchingDrugs)): ?>
                 <div class="result-section">
                     <img class="result" src="https://img.icons8.com/?size=100&id=9shlfoGKqCS7&format=png&color=000000" alt="Các loại thuốc có trong HealMate">
@@ -273,36 +254,30 @@ if (!isset($_SESSION['user'])) {
                                     <td><?= htmlspecialchars($drug['ten_thuoc']) ?></td>
                                     <td><?= htmlspecialchars($drug['ten_hoat_chat']) ?></td>
                                     <td><?= htmlspecialchars($drug['ham_luong']) ?></td>
-                                    <td>
-                                        <a href="<?= htmlspecialchars($drug['url']) ?>" target="_blank">Xem</a>
-                                    </td>
+                                    <td><a href="<?= htmlspecialchars($drug['url']) ?>" target="_blank">Xem</a></td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
             <?php endif; ?>
-            <div class="result-section">
-                <img class="result" src="https://img.icons8.com/?size=100&id=3psXjDzSpADv&format=png&color=000000" alt="Chế độ sinh hoạt">
-                <h2>Chế độ sinh hoạt:</h2>
-                <?php if (!empty($diseaseInfo['workouts'])): ?>
+
+            <?php if (!empty($diseaseInfo['workouts'])): ?>
+                <div class="result-section">
+                    <img class="result" src="https://img.icons8.com/?size=100&id=3psXjDzSpADv&format=png&color=000000" alt="Chế độ sinh hoạt">
+                    <h2>Chế độ sinh hoạt:</h2>
                     <ul>
                         <?php foreach ($diseaseInfo['workouts'] as $w): ?>
                             <li><?= htmlspecialchars($w) ?></li>
                         <?php endforeach; ?>
                     </ul>
-                <?php endif; ?>
-            </div>
-            <?php
-            //Làm sạch
-            $raw_diet = $diseaseInfo['diet'];
-            // Xoá các ký tự không mong muốn
-            $diet = str_replace(["[", "]", "'", '"', "_"], '', $raw_diet);
-            ?>
+                </div>
+            <?php endif; ?>
+
             <div class="result-section">
                 <img class="result" src="https://img.icons8.com/?size=100&id=35G9RMkkBBXc&format=png&color=000000" alt="">
-                <h2> Chế độ ăn uống:</h2>
-                <p><?= htmlspecialchars($diet ?? 'Không có') ?></p>
+                <h2>Chế độ ăn uống:</h2>
+                <p><?= htmlspecialchars($diseaseInfo['diet'] ?? 'Không có') ?></p>
             </div>
         </div>
     </div>

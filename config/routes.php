@@ -27,8 +27,13 @@ switch ($route) {
         break;
 
     case 'profile':
-        include '../app/views/auth/profile.php';
+        $diseaseController->profile();
         break;
+
+    case 'history-detail':
+        $diseaseController->historyDetail();
+        break;
+
 
     case 'logout':
         session_start();
@@ -59,7 +64,7 @@ switch ($route) {
     case 'autocomplete':
         $diseaseController->searchSuggestions();
         break;
-        
+
     case 'search':
         $diseaseController->search();
         break;

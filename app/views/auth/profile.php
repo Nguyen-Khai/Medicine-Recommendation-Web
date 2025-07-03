@@ -1,5 +1,4 @@
 <?php
-session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: index.php?route=login");
     exit();
@@ -7,6 +6,7 @@ if (!isset($_SESSION['user'])) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -37,6 +37,7 @@ if (!isset($_SESSION['user'])) {
                 background-position: 50% 0%;
             }
         }
+
         /*Main*/
         .profile-page {
             display: flex;
@@ -517,7 +518,7 @@ if (!isset($_SESSION['user'])) {
 
 <body>
     <?php
-    include('header.php')
+        include('header.php')
     ?>
     <div class="profile-page">
         <aside class="sidebar">
@@ -543,7 +544,7 @@ if (!isset($_SESSION['user'])) {
                 </li>
                 <li class="nav-item">
                     <img src="https://img.icons8.com/?size=100&id=PyrI7GCv8LCv&format=png&color=000000" alt="icon">
-                    <a href="#advice-history">Lịch sử truy vấn</a>
+                    <a href="#advice-history">Lịch sử tư vấn</a>
                 </li>
             </ul>
         </aside>
@@ -644,16 +645,19 @@ if (!isset($_SESSION['user'])) {
                             d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1110.5 3a7.5 7.5 0 016.15 13.65z" />
                     </svg>
                 </div>
-                <ul>
-                    <li>
-                        Bệnh cảm cúm – Tư vấn lúc 10:30 ngày 05/06/2025
-                        <a href="#" class="detail-link">Xem chi tiết</a>
-                    </li>
-                    <li>
-                        Thiếu máu nhẹ – Tư vấn lúc 14:00 ngày 04/06/2025
-                        <a href="#" class="detail-link">Xem chi tiết</a>
-                    </li>
-                </ul>
+                <?php if (!empty($userHistories)): ?>
+                    <ul>
+                        <?php foreach ($userHistories as $record): ?>
+                            <li>
+                                <?= htmlspecialchars($record['predicted_disease']) ?> –
+                                Tư vấn lúc <?= date('H:i \n\g\à\y d/m/Y', strtotime($record['created_at'])) ?>
+                                <a href="index.php?route=history-detail&id=<?= $record['id'] ?>" class="detail-link">Xem chi tiết</a>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php else: ?>
+                    <p>Không có lịch sử nào.</p>
+                <?php endif; ?>
             </section>
         </main>
     </div>

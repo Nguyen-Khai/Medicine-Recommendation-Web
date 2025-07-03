@@ -7,9 +7,10 @@ if (!isset($_SESSION['user'])) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Giới thiệu</title>
     <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -223,6 +224,29 @@ if (!isset($_SESSION['user'])) {
         text-decoration: none;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         transform: scale(1.02);
+    }
+
+    #suggestions {
+        border: 1px solid #ccc;
+        max-height: 200px;
+        overflow-y: auto;
+        position: relative;
+        top: 21px;
+        background-color: white;
+        z-index: 1000;
+        width: 100%;
+        border-radius: 4px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    #suggestions div {
+        padding: 10px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    #suggestions div:hover {
+        background-color: #f0f0f0;
     }
 
     /*Avatar*/

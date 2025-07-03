@@ -156,4 +156,40 @@ class DiseaseModel
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    // Lưu lịch sử người dùng
+    public function saveUserHistory(array $data)
+    {
+        $stmt = $this->pdo->prepare("INSERT INTO user_history (user_id, symptoms, predicted_disease, description, medications, diet, workouts, precautions)
+                                            VALUES (:user_id, :symptoms, :disease, :description, :medications, :diet, :workouts, :precautions)");
+
+        $stmt->execute([
+            'user_id' => $data['user_id'],
+            'symptoms' => $data['symptoms'],
+            'disease' => $data['disease'],
+            'description' => $data['description'],
+            'medications' => $data['medications'],
+            'diet' => $data['diet'],
+            'workouts' => $data['workouts'],
+            'precautions' => $data['precautions'],
+        ]);
+    }
+
+    //Hiển thị lịch sử tư vấn
+    public function getUserHistoryById($id)
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM user_history WHERE id = ?");
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+
+
+    // Hiển thị chi tiết lịch sử người dùng
+    public function getUserHistory($userId)
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM user_history WHERE user_id = ? ORDER BY created_at DESC");
+        $stmt->execute([$userId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

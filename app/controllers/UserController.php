@@ -43,6 +43,7 @@ class UserController
         }
     }
 
+    // Đăng kí
     public static function handleRegister()
     {
         require_once '../config/database.php';
