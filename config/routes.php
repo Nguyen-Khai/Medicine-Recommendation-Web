@@ -1,5 +1,6 @@
 <?php
 $route = $_GET['route'] ?? 'login';
+$route = $_GET['route'] ?? 'home';
 
 require_once '../app/controllers/UserController.php';
 require_once '../app/controllers/DiagnosisController.php';
@@ -34,6 +35,9 @@ switch ($route) {
         $diseaseController->historyDetail();
         break;
 
+    case 'update-profile':
+        $diseaseController->updateProfile();
+        break;
 
     case 'logout':
         session_start();
@@ -55,6 +59,12 @@ switch ($route) {
 
     case 'handle-register':
         $userController->handleRegister();
+        break;
+
+    case 'change-password':
+        require_once '../app/controllers/UserController.php';
+        $controller = new UserController();
+        $controller->changePassword();
         break;
 
     case 'diagnose':

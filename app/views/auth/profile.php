@@ -1,8 +1,6 @@
 <?php
-if (!isset($_SESSION['user'])) {
-    header("Location: index.php?route=login");
-    exit();
-}
+$avatar = $userInfo['avatar'] ?? null;
+$base64 = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'default-avatar.png';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -10,8 +8,9 @@ if (!isset($_SESSION['user'])) {
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Thông Tin Cá Nhân</title>
+    <title>Tài khoản của tôi</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/4.0.20/fullpage.min.css">
     <style>
@@ -90,7 +89,6 @@ if (!isset($_SESSION['user'])) {
 
         input[type="password"] {
             padding: 10px;
-            margin: 10px 0;
             width: 300px;
             max-width: 100%;
         }
@@ -143,6 +141,12 @@ if (!isset($_SESSION['user'])) {
             text-decoration: underline;
         }
 
+        button#change-avatar-btn {
+            width: 404px !important;
+            background: none !important;
+            color: #1e90ff !important;
+        }
+
         .form-group {
             margin-bottom: 16px;
         }
@@ -157,16 +161,6 @@ if (!isset($_SESSION['user'])) {
         .form-group input {
             width: 100%;
             padding: 10px 12px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 15px;
-        }
-
-        input#fullname {
-            width: 100%;
-            padding: 10px 12px;
-            margin: 0px;
-            max-width: 100%;
             border: 1px solid #ccc;
             border-radius: 6px;
             font-size: 15px;
@@ -229,8 +223,8 @@ if (!isset($_SESSION['user'])) {
         }
 
         .password-form input {
-            height: 40px;
-            width: 100%;
+            height: 45px;
+            width: 400px;
             border: 1px solid #aaa;
             border-radius: 5px;
             font-size: 18px;
@@ -257,7 +251,7 @@ if (!isset($_SESSION['user'])) {
 
         .password-form input:focus+label,
         .password-form input:valid+label {
-            top: 12px;
+            top: 5px;
             font-size: 14px;
             color: #1e90ff;
             font-weight: 500;
@@ -282,89 +276,32 @@ if (!isset($_SESSION['user'])) {
             transform: scale(1.02);
         }
 
-        /*Cài đặt*/
-        #settings {
-            max-width: 400px;
-            margin: 40px auto;
-            padding: 25px 30px;
-            background: #f9f9f9;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        .password-wrapper {
+            position: relative;
         }
 
-        #settings h2 {
-            margin-bottom: 20px;
-            color: #F95454;
-            font-weight: 600;
-            font-size: 1.6rem;
-            text-align: center;
-        }
-
-        #settings label {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 1rem;
-            color: #555;
+        .toggle-password {
+            position: absolute;
+            top: 50%;
+            right: 12px;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
             cursor: pointer;
-            margin-bottom: 15px;
-            user-select: none;
-            position: relative;
-            padding-left: 0;
+            font-size: 20px;
         }
 
-        /* Ẩn checkbox mặc định */
-        #settings input[type="checkbox"] {
-            opacity: 0;
-            width: 0;
-            height: 0;
+        span.toggle-password {
             position: absolute;
+            right: 10px;
         }
 
-        /* Tạo thanh trượt nền */
-        #settings input[type="checkbox"]+span {
-            position: relative;
-            display: inline-block;
-            width: 48px;
-            height: 26px;
-            background-color: #ccc;
-            border-radius: 26px;
-            transition: background-color 0.3s ease;
-        }
-
-        /* Tạo nút trượt */
-        #settings input[type="checkbox"]+span::before {
-            content: "";
-            position: absolute;
-            left: 3px;
-            top: 3px;
-            width: 20px;
-            height: 20px;
-            background-color: white;
-            border-radius: 50%;
-            transition: transform 0.3s ease;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-        }
-
-        /* Khi checkbox được check, đổi màu nền và dịch nút trượt sang phải */
-        #settings input[type="checkbox"]:checked+span {
-            background-color: #0d6efd;
-        }
-
-        #settings input[type="checkbox"]:checked+span::before {
-            transform: translateX(22px);
+        .eye-icon {
+            pointer-events: none;
+            /* Để không chặn sự kiện click */
         }
 
         /*Lịch sử tìm kiếm*/
-        #search-history {
-            max-width: 480px;
-            margin: 40px auto;
-            padding: 25px 30px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
-        }
-
         #search-history h2 {
             text-align: center;
             margin-bottom: 20px;
@@ -382,7 +319,7 @@ if (!isset($_SESSION['user'])) {
 
         #search-history ul li {
             position: relative;
-            padding: 14px 120px 14px 90px;
+            padding: 14px 120px 14px 175px;
             border-bottom: 1px solid #eee;
             font-size: 1rem;
             color: #444;
@@ -397,7 +334,7 @@ if (!isset($_SESSION['user'])) {
 
         #search-history ul li:hover {
             background-color: #f5faff;
-            color: #222;
+            color: #F95454;
         }
 
         /* Icon đồng hồ bên trái */
@@ -441,7 +378,12 @@ if (!isset($_SESSION['user'])) {
 
         /*Lịch sử tư vấn*/
         #advice-history h2 {
+            text-align: center;
+            margin-bottom: 20px;
             color: #F95454;
+            font-weight: 600;
+            font-size: 1.7rem;
+            letter-spacing: 0.02em;
         }
 
         #advice-history ul {
@@ -466,7 +408,7 @@ if (!isset($_SESSION['user'])) {
 
         #advice-history ul li:hover {
             background-color: #f0f8ff;
-            color: #222;
+            color: #F95454;
         }
 
         .detail-link {
@@ -485,19 +427,13 @@ if (!isset($_SESSION['user'])) {
             color: #005fa3;
         }
 
-        input[type="text"] {
-            width: 100%;
+        input {
             max-width: 400px;
-            padding: 8px 12px;
-            margin: 12px 0 20px 0;
-            font-size: 16px;
-            border-radius: 5px;
-            border: 1.5px solid #ccc;
             outline: none;
             font-family: 'Merriweather', serif;
         }
 
-        input[type="text"]:focus {
+        input:focus {
             border-color: #1e90ff;
             box-shadow: 0 0 5px rgba(30, 144, 255, 0.5);
         }
@@ -518,7 +454,7 @@ if (!isset($_SESSION['user'])) {
 
 <body>
     <?php
-        include('header.php')
+    include('header.php')
     ?>
     <div class="profile-page">
         <aside class="sidebar">
@@ -532,10 +468,6 @@ if (!isset($_SESSION['user'])) {
                 <li class="nav-item">
                     <img src="https://img.icons8.com/?size=100&id=8OdwzXFjBVH2&format=png&color=000000" alt="icon">
                     <a href="#change-password">Đổi mật khẩu</a>
-                </li>
-                <li class="nav-item">
-                    <img src="https://img.icons8.com/?size=100&id=N5JNmydXBuCl&format=png&color=000000" alt="icon">
-                    <a href="#settings">Cài đặt</a>
                 </li>
                 <li><strong>Lịch sử</strong></li>
                 <li class="nav-item">
@@ -551,73 +483,81 @@ if (!isset($_SESSION['user'])) {
         <main class="content">
             <section id="profile">
                 <h2>Hồ sơ cá nhân</h2>
-
-                <div class="avatar-section">
-                    <img id="avatar-preview" src="default-avatar.png" alt="Ảnh đại diện">
-                    <a href="#" id="change-avatar-link">Thay đổi ảnh đại diện</a>
-                    <input type="file" id="avatar-input" accept="image/*" hidden>
-                </div>
-
-                <form id="profile-form">
+                <form id="profile-form" method="POST" action="index.php?route=update-profile" enctype="multipart/form-data">
+                    <div class="avatar-section">
+                        <img id="avatar-preview" src="<?= $base64 ?>" alt="Ảnh đại diện">
+                        <button type="button" id="change-avatar-btn">Thay đổi ảnh đại diện</button>
+                        <input type="file" name="avatar" id="avatar-input" accept="image/*" hidden>
+                    </div>
                     <div class="form-group">
                         <label for="fullname">Họ tên:</label>
-                        <input type="text" id="fullname" value="Nguyễn Văn A">
+                        <input type="text" id="fullname" name="name" value="<?= htmlspecialchars($userInfo['name'] ?? '') ?>">
                     </div>
 
                     <div class="form-group">
                         <label for="email">Email:</label>
-                        <input type="email" id="email" value="example@email.com">
+                        <input type="email" id="email" name="email" value="<?= htmlspecialchars($userInfo['email'] ?? '') ?>">
                     </div>
 
                     <div class="form-group">
                         <label for="dob">Ngày sinh:</label>
-                        <input type="date" id="dob" value="1990-01-01">
+                        <input type="date" id="dob" name="dob" value="<?= htmlspecialchars($userInfo['dob'] ?? '') ?>">
                     </div>
 
                     <div class="form-group">
                         <label>Giới tính:</label>
                         <div class="gender-options">
-                            <label><input type="radio" name="gender" value="male" checked> Nam</label>
-                            <label><input type="radio" name="gender" value="female"> Nữ</label>
+                            <label>
+                                <input type="radio" name="gender" value="male" <?= (isset($userInfo['gender']) && $userInfo['gender'] == 'male') ? 'checked' : '' ?>>
+                                Nam
+                            </label>
+                            <label>
+                                <input type="radio" name="gender" value="female" <?= (isset($userInfo['gender']) && $userInfo['gender'] == 'female') ? 'checked' : '' ?>>
+                                Nữ
+                            </label>
                         </div>
                     </div>
-
                     <button type="submit">Cập nhật</button>
                 </form>
             </section>
             <section id="change-password">
                 <h2>Đổi mật khẩu</h2>
-                <form class="password-form">
+                <?php if (!empty($_SESSION['error'])): ?>
+                    <p style="color: #F95454; margin-bottom: 10px; font-weight: bold; position: relative; left: 94px; bottom: 11px;"><?= $_SESSION['error'];
+                                            unset($_SESSION['error']); ?></p>
+                <?php endif; ?>
+                <?php if (!empty($_SESSION['success'])): ?>
+                    <p style="color:green; margin-bottom: 10px; font-weight: bold; position: relative; left: 94px; bottom: 11px;"><?= $_SESSION['success'];
+                                            unset($_SESSION['success']); ?></p>
+                <?php endif; ?>
+                <form class="password-form" method="POST" action="index.php?route=change-password">
                     <div class="form-group">
-                        <input type="password" id="current-password" required>
+                        <input type="password" id="current-password" name="current-password" required />
                         <label for="current-password">Mật khẩu hiện tại</label>
+                        <span type="button" class="toggle-password" onclick="togglePassword('current-password', this)">
+                            <img src="assets/images/close eye.png" alt="Hiện mật khẩu" class="eye-icon" />
+                        </span>
                     </div>
                     <div class="form-group">
-                        <input type="password" id="new-password" required>
+                        <input type="password" id="new-password" name="new-password" required />
                         <label for="new-password">Mật khẩu mới</label>
+                        <span type="button" class="toggle-password" onclick="togglePassword('new-password', this)">
+                            <img src="assets/images/close eye.png" alt="Hiện mật khẩu" class="eye-icon" />
+                        </span>
                     </div>
                     <div class="form-group">
-                        <input type="password" id="confirm-password" required>
+                        <input type="password" id="confirm-password" name="confirm-password" required />
                         <label for="confirm-password">Xác nhận mật khẩu</label>
+                        <span type="button" class="toggle-password" onclick="togglePassword('confirm-password', this)">
+                            <img src="assets/images/close eye.png" alt="Hiện mật khẩu" class="eye-icon" />
+                        </span>
                     </div>
                     <button type="submit">Cập nhật mật khẩu</button>
                 </form>
             </section>
-            <section id="settings">
-                <h2>Cài đặt</h2>
-                <label>
-                    Nhận thông báo email
-                    <input type="checkbox">
-                    <span></span>
-                </label>
-                <label>
-                    Chế độ tối
-                    <input type="checkbox">
-                    <span></span>
-                </label>
-            </section>
             <section id="search-history">
                 <h2>Lịch sử tìm kiếm</h2>
+
                 <div class="input-with-icon">
                     <input type="text" id="search-filter" placeholder="Tìm kiếm trong lịch sử tìm kiếm...">
                     <svg class="icon-search" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20">
@@ -625,15 +565,18 @@ if (!isset($_SESSION['user'])) {
                             d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1110.5 3a7.5 7.5 0 016.15 13.65z" />
                     </svg>
                 </div>
-                <ul>
-                    <li data-time="10:15">
-                        Abitol_Tablet
-                        <a href="#" class="detail-link">Tìm kiếm ngay</a>
-                    </li>
-                    <li data-time="09:20">
-                        A_Ret_HC_Cream
-                        <a href="#" class="detail-link">Tìm kiếm ngay</a>
-                    </li>
+
+                <ul id="search-history-list">
+                    <?php if (!empty($searchHistories)): ?>
+                        <?php foreach ($searchHistories as $item): ?>
+                            <li data-time="<?= date(' d/m/Y H:i', strtotime($item['created_at'])) ?>">
+                                <?= htmlspecialchars($item['keyword']) ?>
+                                <a href="index.php?route=search&query=<?= urlencode($item['keyword']) ?>" class="detail-link">Tìm kiếm ngay</a>
+                            </li>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <li>Không có lịch sử tìm kiếm nào.</li>
+                    <?php endif; ?>
                 </ul>
             </section>
             <section id="advice-history">
@@ -712,6 +655,58 @@ if (!isset($_SESSION['user'])) {
         closeBtn.addEventListener('click', () => {
             sidebar.classList.remove('open');
         });
+
+        //Lịch sử tìm kiếm
+        document.getElementById('search-filter').addEventListener('input', function() {
+            const keyword = this.value.toLowerCase();
+            const items = document.querySelectorAll('#search-history-list li');
+
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(keyword) ? 'list-item' : 'none';
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const changeAvatarBtn = document.getElementById('change-avatar-btn');
+            const avatarInput = document.getElementById('avatar-input');
+            const avatarPreview = document.getElementById('avatar-preview');
+
+            if (changeAvatarBtn && avatarInput && avatarPreview) {
+                changeAvatarBtn.addEventListener('click', function() {
+                    avatarInput.click();
+                });
+
+                avatarInput.addEventListener('change', function() {
+                    const file = this.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            avatarPreview.src = e.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            } else {
+                console.warn("❌ Một trong các phần tử avatar không được tìm thấy!");
+            }
+        });
+
+        function togglePassword(inputId, button) {
+            const passwordInput = document.getElementById(inputId);
+            const img = button.querySelector("img");
+
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                img.src = "assets/images/open eye.png"; // Đường dẫn tới icon "ẩn mật khẩu"
+                img.alt = "Ẩn mật khẩu";
+            } else {
+                passwordInput.type = "password";
+                img.src = "assets/images/close eye.png"; // Đường dẫn tới icon "hiện mật khẩu"
+                img.alt = "Hiện mật khẩu";
+            }
+        }
     </script>
 </body>
 

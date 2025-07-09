@@ -55,7 +55,7 @@ class UserController
             $email = $_POST['email'] ?? '';
             $password = $_POST['password'] ?? '';
             $confirm = $_POST['confirm-password'] ?? '';
-            $birthday = $_POST['birthday'] ?? '';
+            $dob = $_POST['dob'] ?? '';
             $gender = $_POST['gender'] ?? '';
 
             // Kiểm tra mật khẩu khớp
@@ -85,5 +85,46 @@ class UserController
                 include '../app/views/auth/login.php';
             }
         }
+    }
+
+    //Đổi mật khẩu
+    public function changePassword()
+    {
+        if (!isset($_SESSION['user'])) {
+            echo "Bạn chưa đăng nhập.";
+            return;
+        }
+
+        $current = $_POST['current-password'] ?? '';
+        $new = $_POST['new-password'] ?? '';
+        $confirm = $_POST['confirm-password'] ?? '';
+
+        if ($new !== $confirm) {
+            $_SESSION['error'] = "Xác nhận mật khẩu không khớp.";
+            header("Location: index.php?route=profile#change-password");
+            exit();
+        }
+
+        require_once '../app/models/DiseaseModel.php';
+        $model = new DiseaseModel();
+        $user = $model->getUserById($_SESSION['user']['id']);
+
+        if (!$user || !password_verify($current, $user['password'])) {
+           $_SESSION['error'] = "Mật khẩu hiện tại không đúng.";
+            header("Location: index.php?route=profile#change-password");
+            exit();
+        }
+
+       $hashedPassword = password_hash($new, PASSWORD_DEFAULT);
+        $updated = $model->updatePassword($_SESSION['user']['id'], $hashedPassword);
+
+        if ($updated) {
+            $_SESSION['success'] = "Thay đổi mật khẩu thành công.";
+        } else {
+            $_SESSION['error'] = "Đã có lỗi xảy ra khi cập nhật.";
+        }
+
+        header("Location: index.php?route=profile#change-password");
+        exit();
     }
 }

@@ -1,3 +1,16 @@
+<?php
+if (!isset($_SESSION['user'])) {
+    header("Location: index.php?route=login");
+    exit();
+}
+
+require_once '../app/models/DiseaseModel.php';
+$userModel = new DiseaseModel();
+$userInfo = $userModel->getUserById($_SESSION['user']['id']); // lấy avatar từ DB
+$avatar = $userInfo['avatar'] ?? null;
+$avatarSrc = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'assets/images/default-avatar.png';
+?>
+
 <style>
     body {
         margin: 0;
@@ -102,6 +115,13 @@
         text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.4);
         color: #ffffff;
         font-weight: 900;
+    }
+
+    nav.main-nav a.active {
+        color: #ffffff;
+        font-weight: bold;
+        transform: translateY(-5px);
+        text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.4);
     }
 
     /*Tìm kiếm*/
@@ -256,7 +276,7 @@
         z-index: 1;
         border-radius: 6px;
         padding: 8px 0;
-        top: 77px;
+        top: 88px;
     }
 
     .dropdown-menu a {
@@ -274,8 +294,8 @@
     h2.name {
         font-size: 18px;
         position: relative;
-        right: -124px;
-        top: -10px;
+        right: -110px;
+        top: -20px;
         background: linear-gradient(270deg, #ffffff, #EFF3EA, #FFF3AF, #FFACAC, #F95454, #C62E2E);
         background-size: 600% 600%;
         background-clip: text;
@@ -325,9 +345,9 @@
             <button class="search">Tìm kiếm</button>
         </div>
         <div class="avatar-dropdown">
-            <img src="" alt="Avatar" class="avatar" onclick="toggleDropdown()">
+            <img src="<?= $avatarSrc ?>" alt="Avatar" class="avatar" onclick="toggleDropdown()">
             <div class="dropdown-menu" id="dropdown-menu">
-                <a href="index.php?route=profile">Thông tin cá nhân</a>
+                <a href="index.php?route=profile#profile">Thông tin cá nhân</a>
                 <a href="#" onclick="logout()">Đăng xuất</a>
             </div>
             <h2 class="name">Chào <?= htmlspecialchars($_SESSION['user']['name']) ?>!</h2>
@@ -343,7 +363,9 @@
     function logout() {
         Swal.fire({
             title: 'Bạn có chắc muốn đăng xuất?',
-            icon: 'warning',
+            imageUrl: 'assets/images/question_mask.png', // ảnh bạn muốn dùng
+            imageWidth: 150,
+            imageHeight: 150,
             showCancelButton: true,
             cancelButtonText: 'Không',
             confirmButtonText: 'Có',
@@ -420,6 +442,21 @@
         const keyword = document.getElementById('searchInput').value.trim();
         if (keyword.length > 0) {
             window.location.href = `index.php?route=search&query=${encodeURIComponent(keyword)}`;
+        }
+    });
+
+    // In Đậm trang đang ở hiện tại
+    const links = document.querySelectorAll('.main-nav a');
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentRoute = urlParams.get('route');
+
+    links.forEach(link => {
+        const href = link.getAttribute('href');
+        const hrefParams = new URLSearchParams(href.split('?')[1]);
+        const routeInLink = hrefParams.get('route');
+
+        if (routeInLink === currentRoute) {
+            link.classList.add('active');
         }
     });
 </script>

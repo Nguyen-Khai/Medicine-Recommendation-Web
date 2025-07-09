@@ -1,9 +1,4 @@
 <?php
-if (!isset($_SESSION['user'])) {
-    header("Location: index.php?route=login");
-    exit();
-}
-
 require_once '../app/models/DiseaseModel.php';
 $model = new DiseaseModel();
 ?>
@@ -273,11 +268,16 @@ $model = new DiseaseModel();
                     </ul>
                 </div>
             <?php endif; ?>
-
+            <?php
+            //Làm sạch
+            $raw_diet = $diseaseInfo['diet'];
+            // Xoá các ký tự không mong muốn
+            $diet = str_replace(["[", "]", "'", '"', "_"], '', $raw_diet);
+            ?>
             <div class="result-section">
                 <img class="result" src="https://img.icons8.com/?size=100&id=35G9RMkkBBXc&format=png&color=000000" alt="">
                 <h2>Chế độ ăn uống:</h2>
-                <p><?= htmlspecialchars($diseaseInfo['diet'] ?? 'Không có') ?></p>
+                <p><?= htmlspecialchars($diet ?? 'Không có') ?></p>
             </div>
         </div>
     </div>

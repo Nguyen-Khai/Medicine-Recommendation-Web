@@ -2,6 +2,7 @@
 session_start();  // <- THÊM DÒNG NÀY
 require_once '../app/models/DiseaseModel.php';
 
+
 class DiseaseController
 {
     private $model;
@@ -79,10 +80,22 @@ class DiseaseController
         echo json_encode($term !== '' ? $this->model->searchDrugSuggestions($term) : []);
     }
 
+    //Lịch sử tìm kiếm
     public function search()
     {
-        $keyword = trim($_GET['query'] ?? '');
-        $results = $keyword !== '' ? $this->model->searchDrugsWithDetails($keyword) : [];
+        $keyword = $_GET['query'] ?? '';
+        $keyword = trim($keyword);
+
+        $results = [];
+        if ($keyword !== '') {
+            $results = $this->model->searchDrugsWithDetails($keyword);
+
+            // ✅ Lưu lịch sử tìm kiếm nếu người dùng đã đăng nhập
+            if (isset($_SESSION['user']['id'])) {
+                $this->model->saveSearchHistory($_SESSION['user']['id'], $keyword);
+            }
+        }
+
         require '../app/views/auth/search_result.php';
     }
 
@@ -96,9 +109,28 @@ class DiseaseController
             exit();
         }
 
-        $userHistories = $this->model->getUserHistory($userId); // gọi model
+        $userHistories = $this->model->getUserHistory($userId);
+        $searchHistories = $this->model->getUserSearchHistory($userId);
+        $userInfo = $this->model->getUserById($userId);
 
         require '../app/views/auth/profile.php';
+    }
+
+    // Hiển thị lịch sử người dùng
+    public function avatar()
+    {
+        $userId = $_SESSION['user']['id'] ?? null;
+
+        if (!$userId) {
+            header("Location: index.php?route=login");
+            exit();
+        }
+
+        $userHistories = $this->model->getUserHistory($userId);
+        $searchHistories = $this->model->getUserSearchHistory($userId);
+        $userInfo = $this->model->getUserById($userId);
+
+        require '../app/views/auth/home.php';
     }
 
     public function historyDetail()
@@ -142,5 +174,40 @@ class DiseaseController
         $matchingDrugs = $this->model->findDrugsByIngredients($keywords);
 
         require '../app/views/auth/history.php';
+    }
+
+    //Cập nhập hồ sơ
+    public function updateProfile()
+    {
+        $userId = $_SESSION['user']['id'];
+
+        // Lấy thông tin form
+        $name   = $_POST['name'] ?? '';
+        $email  = $_POST['email'] ?? '';
+        $dob    = $_POST['dob'] ?? null;
+        $gender = $_POST['gender'] ?? '';
+
+        // Chuẩn bị avatar nếu có
+        $avatarData = null;
+        if (!empty($_FILES['avatar']['tmp_name'])) {
+            $avatarData = file_get_contents($_FILES['avatar']['tmp_name']);
+        }
+
+        // Cập nhật vào DB
+        $pdo = require '../config/database.php';
+
+        if ($avatarData) {
+            $stmt = $pdo->prepare("UPDATE users SET name = ?, email = ?, dob = ?, gender = ?, avatar = ? WHERE id = ?");
+            $stmt->execute([$name, $email, $dob, $gender, $avatarData, $userId]);
+        } else {
+            $stmt = $pdo->prepare("UPDATE users SET name = ?, email = ?, dob = ?, gender = ? WHERE id = ?");
+            $stmt->execute([$name, $email, $dob, $gender, $userId]);
+        }
+
+        // Cập nhật session (nếu có)
+        $_SESSION['user']['name'] = $name;
+
+        header('Location: index.php?route=profile#profile');
+        exit();
     }
 }

@@ -9,3 +9,5 @@ try {
 } catch (PDOException $e) {
     die("Kết nối thất bại: " . $e->getMessage());
 }
+
+return $pdo;

@@ -442,7 +442,7 @@
                                 <label>Họ tên</label>
                             </div>
                             <div class="login">
-                                <input type="date" name="birthday" required />
+                                <input type="date" name="dob" required />
                                 <label class="date">Ngày sinh</label>
                             </div>
                             <div class="gender-group">

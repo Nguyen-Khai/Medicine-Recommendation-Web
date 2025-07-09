@@ -1,10 +1,3 @@
-<?php
-session_start();
-if (!isset($_SESSION['user'])) {
-    header("Location: index.php?route=login");
-    exit();
-}
-?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,6 +5,7 @@ if (!isset($_SESSION['user'])) {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kết quả tìm kiếm</title>
+    <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather&display=swap">
     <style>
         body {

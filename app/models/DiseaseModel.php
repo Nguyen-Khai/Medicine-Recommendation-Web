@@ -183,13 +183,51 @@ class DiseaseModel
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-
-
     // Hiển thị chi tiết lịch sử người dùng
     public function getUserHistory($userId)
     {
         $stmt = $this->pdo->prepare("SELECT * FROM user_history WHERE user_id = ? ORDER BY created_at DESC");
         $stmt->execute([$userId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    //Lưu lịch sử tìm kiếm
+    public function saveSearchHistory($userId, $keyword)
+    {
+        $stmt = $this->pdo->prepare("INSERT INTO search_history (user_id, keyword) VALUES (?, ?)");
+        $stmt->execute([$userId, $keyword]);
+    }
+
+    //Hiển thị lịch sử tìm kiếm
+    public function getUserSearchHistory($userId)
+    {
+        $stmt = $this->pdo->prepare("SELECT keyword, created_at FROM search_history WHERE user_id = ? ORDER BY created_at DESC");
+        $stmt->execute([$userId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    //Hiển thị hồ sơ
+    public function getUserById($id)
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM users WHERE id = ?");
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    //Cập nhập hồ sơ
+    public function updateUserProfile($id, $name, $email, $dob, $gender, $avatar)
+    {
+        $stmt = $this->pdo->prepare("UPDATE users SET name = ?, email = ?, dob = ?, gender = ?, avatar = ? WHERE id = ?");
+        $stmt->execute([$name, $email, $dob, $gender, $avatar, $id]);
+    }
+
+    //Đổi mật khẩu
+    public function updatePassword($userId, $hashedPassword)
+    {
+        $stmt = $this->pdo->prepare("UPDATE users SET password = :password WHERE id = :id");
+        return $stmt->execute([
+            ':password' => $hashedPassword,
+            ':id' => $userId
+        ]);
     }
 }
