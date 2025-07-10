@@ -230,4 +230,18 @@ class DiseaseModel
             ':id' => $userId
         ]);
     }
+
+    //Mã xác nhận
+    public function findByUsernameAndEmail($username, $email)
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM users WHERE username = ? AND email = ?");
+        $stmt->execute([$username, $email]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function changePassword($userId, $newHashedPassword)
+    {
+        $stmt = $this->pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
+        return $stmt->execute([$newHashedPassword, $userId]);
+    }
 }

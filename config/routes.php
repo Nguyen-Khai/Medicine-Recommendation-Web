@@ -61,6 +61,34 @@ switch ($route) {
         $userController->handleRegister();
         break;
 
+    case 'forgot_password':
+        $userController->fogrot_password();
+        break;
+
+    case 'handle-forgot-password':
+        $userController->handleForgotPassword();
+        break;
+
+    case 'verify-reset-code':
+        $userController->verify_reset_code();
+        break;
+
+    case 'verifyResetCode':
+        $userController->verifyResetCode();
+        break;
+
+    case 'reset_password':
+        $userController->reset_password();
+        break;
+
+    case 'handle-reset-password':
+        $userController->handleResetPassword();
+        break;
+
+    case 'resend-verification-code':
+        $userController->resendVerificationCode();
+        break;
+
     case 'change-password':
         require_once '../app/controllers/UserController.php';
         $controller = new UserController();

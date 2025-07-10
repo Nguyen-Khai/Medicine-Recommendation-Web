@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Form Đăng Nhập / Đăng Ký</title>
+    <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather&display=swap">
     <style>
         * {
@@ -398,13 +399,17 @@
                         <?= htmlspecialchars($success) ?>
                     </div>
                 <?php endif; ?>
+                <?php if (!empty($_SESSION['success'])): ?>
+                    <p style="color:green;  margin-bottom: 10px; font-weight: bold; position: absolute; top: 10px;"><?= $_SESSION['success'];
+                                                                                                                    unset($_SESSION['success']); ?></p>
+                <?php endif; ?>
                 <form action="index.php?route=handle-login" method="POST">
                     <div class="login">
                         <input type="text" name="username" id="login-username" required />
                         <label>Username</label>
                     </div>
                     <div class="forgot_password">
-                        <a class="forgot_password" href="index.php?route=forgot-password">Quên mật khẩu?</a>
+                        <a class="forgot_password" href="index.php?route=forgot_password">Quên mật khẩu?</a>
                     </div>
                     <div class="login">
                         <input type="password" id="login-password" name="password" required />
