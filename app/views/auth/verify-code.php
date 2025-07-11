@@ -6,14 +6,14 @@
     <p style="color:green; margin-bottom: 10px; font-weight: bold; position: relative; top: -13px;"><?= $_SESSION['success'];
                                                                                                     unset($_SESSION['success']); ?></p>
 <?php endif; ?>
-<h2>Nhập mã xác nhận</h2>
+<h2>Enter verification code</h2>
 <form method="POST" action="index.php?route=verifyResetCode">
     <input type="text" name="code" placeholder="Nhập mã xác nhận" required>
-    <button type="submit">Xác nhận</button>
+    <button type="submit">Confirm</button>
 </form>
 
 <p style="margin-top: 12px;">
     <a href="index.php?route=resend-verification-code" style="color: #1e90ff; text-decoration: underline;">
-        Chưa nhận được mã? Gửi lại mã xác nhận
+        Didn't receive the code? Resend verification code
     </a>
 </p>

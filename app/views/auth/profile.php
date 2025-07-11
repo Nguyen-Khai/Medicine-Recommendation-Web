@@ -8,7 +8,7 @@ $base64 = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'default
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tài khoản của tôi</title>
+    <title>My information</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather&display=swap">
@@ -458,39 +458,39 @@ $base64 = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'default
     ?>
     <div class="profile-page">
         <aside class="sidebar">
-            <h2>Tài khoản của tôi</h2>
+            <h2>My account</h2>
             <ul>
-                <li><strong>Thông tin cá nhân</strong></li>
+                <li><strong>My information</strong></li>
                 <li class="nav-item">
                     <img src="https://img.icons8.com/?size=100&id=RH2knxpdDpjm&format=png&color=000000" alt="icon">
-                    <a href="#profile">Hồ sơ</a>
+                    <a href="#profile">Profile</a>
                 </li>
                 <li class="nav-item">
                     <img src="https://img.icons8.com/?size=100&id=8OdwzXFjBVH2&format=png&color=000000" alt="icon">
-                    <a href="#change-password">Đổi mật khẩu</a>
+                    <a href="#change-password">Change password</a>
                 </li>
-                <li><strong>Lịch sử</strong></li>
+                <li><strong>History</strong></li>
                 <li class="nav-item">
                     <img src="https://img.icons8.com/?size=100&id=ObuWtTlsoTj6&format=png&color=000000" alt="icon">
-                    <a href="#search-history">Lịch sử tìm kiếm</a>
+                    <a href="#search-history">Search history</a>
                 </li>
                 <li class="nav-item">
                     <img src="https://img.icons8.com/?size=100&id=PyrI7GCv8LCv&format=png&color=000000" alt="icon">
-                    <a href="#advice-history">Lịch sử tư vấn</a>
+                    <a href="#advice-history">Recommendation history</a>
                 </li>
             </ul>
         </aside>
         <main class="content">
             <section id="profile">
-                <h2>Hồ sơ cá nhân</h2>
+                <h2>Profile</h2>
                 <form id="profile-form" method="POST" action="index.php?route=update-profile" enctype="multipart/form-data">
                     <div class="avatar-section">
                         <img id="avatar-preview" src="<?= $base64 ?>" alt="Ảnh đại diện">
-                        <button type="button" id="change-avatar-btn">Thay đổi ảnh đại diện</button>
+                        <button type="button" id="change-avatar-btn">Change Avatar</button>
                         <input type="file" name="avatar" id="avatar-input" accept="image/*" hidden>
                     </div>
                     <div class="form-group">
-                        <label for="fullname">Họ tên:</label>
+                        <label for="fullname">Full name:</label>
                         <input type="text" id="fullname" name="name" value="<?= htmlspecialchars($userInfo['name'] ?? '') ?>">
                     </div>
 
@@ -500,28 +500,28 @@ $base64 = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'default
                     </div>
 
                     <div class="form-group">
-                        <label for="dob">Ngày sinh:</label>
+                        <label for="dob">Birthday:</label>
                         <input type="date" id="dob" name="dob" value="<?= htmlspecialchars($userInfo['dob'] ?? '') ?>">
                     </div>
 
                     <div class="form-group">
-                        <label>Giới tính:</label>
+                        <label>Gender:</label>
                         <div class="gender-options">
                             <label>
                                 <input type="radio" name="gender" value="male" <?= (isset($userInfo['gender']) && $userInfo['gender'] == 'male') ? 'checked' : '' ?>>
-                                Nam
+                                Male
                             </label>
                             <label>
                                 <input type="radio" name="gender" value="female" <?= (isset($userInfo['gender']) && $userInfo['gender'] == 'female') ? 'checked' : '' ?>>
-                                Nữ
+                                Female
                             </label>
                         </div>
                     </div>
-                    <button type="submit">Cập nhật</button>
+                    <button type="submit">Update</button>
                 </form>
             </section>
             <section id="change-password">
-                <h2>Đổi mật khẩu</h2>
+                <h2>Change password</h2>
                 <?php if (!empty($_SESSION['error'])): ?>
                     <p style="color: #F95454; margin-bottom: 10px; font-weight: bold; position: relative; left: 94px; bottom: 11px;"><?= $_SESSION['error'];
                                             unset($_SESSION['error']); ?></p>
@@ -533,30 +533,30 @@ $base64 = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'default
                 <form class="password-form" method="POST" action="index.php?route=change-password">
                     <div class="form-group">
                         <input type="password" id="current-password" name="current-password" required />
-                        <label for="current-password">Mật khẩu hiện tại</label>
+                        <label for="current-password">Current password</label>
                         <span type="button" class="toggle-password" onclick="togglePassword('current-password', this)">
                             <img src="assets/images/close eye.png" alt="Hiện mật khẩu" class="eye-icon" />
                         </span>
                     </div>
                     <div class="form-group">
                         <input type="password" id="new-password" name="new-password" required />
-                        <label for="new-password">Mật khẩu mới</label>
+                        <label for="new-password">New password</label>
                         <span type="button" class="toggle-password" onclick="togglePassword('new-password', this)">
                             <img src="assets/images/close eye.png" alt="Hiện mật khẩu" class="eye-icon" />
                         </span>
                     </div>
                     <div class="form-group">
                         <input type="password" id="confirm-password" name="confirm-password" required />
-                        <label for="confirm-password">Xác nhận mật khẩu</label>
+                        <label for="confirm-password">Confirm password</label>
                         <span type="button" class="toggle-password" onclick="togglePassword('confirm-password', this)">
                             <img src="assets/images/close eye.png" alt="Hiện mật khẩu" class="eye-icon" />
                         </span>
                     </div>
-                    <button type="submit">Cập nhật mật khẩu</button>
+                    <button type="submit">Update password</button>
                 </form>
             </section>
             <section id="search-history">
-                <h2>Lịch sử tìm kiếm</h2>
+                <h2>Search history</h2>
 
                 <div class="input-with-icon">
                     <input type="text" id="search-filter" placeholder="Tìm kiếm trong lịch sử tìm kiếm...">
@@ -571,16 +571,16 @@ $base64 = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'default
                         <?php foreach ($searchHistories as $item): ?>
                             <li data-time="<?= date(' d/m/Y H:i', strtotime($item['created_at'])) ?>">
                                 <?= htmlspecialchars($item['keyword']) ?>
-                                <a href="index.php?route=search&query=<?= urlencode($item['keyword']) ?>" class="detail-link">Tìm kiếm ngay</a>
+                                <a href="index.php?route=search&query=<?= urlencode($item['keyword']) ?>" class="detail-link">Search now</a>
                             </li>
                         <?php endforeach; ?>
                     <?php else: ?>
-                        <li>Không có lịch sử tìm kiếm nào.</li>
+                        <li>There's no search history.</li>
                     <?php endif; ?>
                 </ul>
             </section>
             <section id="advice-history">
-                <h2>Lịch sử tư vấn</h2>
+                <h2>Recommendation history</h2>
                 <div class="input-with-icon">
                     <input type="text" id="search-filter" placeholder="Tìm kiếm trong lịch sử tư vấn...">
                     <svg class="icon-search" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20">
@@ -593,13 +593,13 @@ $base64 = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'default
                         <?php foreach ($userHistories as $record): ?>
                             <li>
                                 <?= htmlspecialchars($record['predicted_disease']) ?> –
-                                Tư vấn lúc <?= date('H:i \n\g\à\y d/m/Y', strtotime($record['created_at'])) ?>
-                                <a href="index.php?route=history-detail&id=<?= $record['id'] ?>" class="detail-link">Xem chi tiết</a>
+                                recommend at <?= date('H:i \n\g\à\y d/m/Y', strtotime($record['created_at'])) ?>
+                                <a href="index.php?route=history-detail&id=<?= $record['id'] ?>" class="detail-link">Details</a>
                             </li>
                         <?php endforeach; ?>
                     </ul>
                 <?php else: ?>
-                    <p>Không có lịch sử nào.</p>
+                    <p>There's no history</p>
                 <?php endif; ?>
             </section>
         </main>

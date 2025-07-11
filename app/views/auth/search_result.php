@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Kết quả tìm kiếm</title>
+    <title>Search result</title>
     <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather&display=swap">
     <style>
@@ -177,7 +177,7 @@
     <div class="circle circle3"></div>
     <div class="circle circle4"></div>
     <div class="section">
-        <h2 class="st2-title">Kết quả tìm kiếm cho: "<?= htmlspecialchars($keyword) ?>"</h2>
+        <h2 class="st2-title">Search result for: "<?= htmlspecialchars($keyword) ?>"</h2>
         <?php if (!empty($results)): ?>
             <ul id="article-list">
                 <?php foreach ($results as $med): ?>
@@ -185,16 +185,16 @@
                         <div class="health-article">
                             <h3 class="article-title"><?= htmlspecialchars($med['ten_thuoc']) ?></h3>
                             <div class="article-meta">
-                                <div class="info-line"><strong>Thành phần:</strong> <?= htmlspecialchars($med['ten_hoat_chat']) ?></div>
-                                <div class="info-line"><strong>Hàm lượng:</strong> <?= htmlspecialchars($med['ham_luong']) ?></div>
+                                <div class="info-line"><strong>Ingredient:</strong> <?= htmlspecialchars($med['ten_hoat_chat']) ?></div>
+                                <div class="info-line"><strong>Content:</strong> <?= htmlspecialchars($med['ham_luong']) ?></div>
                             </div>
-                            <a href="<?= htmlspecialchars($med['url']) ?>" target="_blank">Tìm hiểu thêm</a>
+                            <a href="<?= htmlspecialchars($med['url']) ?>" target="_blank">Learn more</a>
                         </div>
                     </li>
                 <?php endforeach; ?>
             </ul>
         <?php else: ?>
-            <p>Không tìm thấy thuốc hoặc hoạt chất nào phù hợp.</p>
+            <p>No matching medicine or active ingredients were found.</p>
         <?php endif; ?>
         <div id="pagination"></div>
     </div>

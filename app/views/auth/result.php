@@ -10,7 +10,7 @@ if (!isset($_SESSION['user'])) {
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Kết quả tư vấn</title>
+    <title>Recommendation Result</title>
     <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather&display=swap">
@@ -169,34 +169,34 @@ if (!isset($_SESSION['user'])) {
         <div class="result-container">
             <div class="result-section">
                 <img class="result" src="https://img.icons8.com/?size=100&id=uACqhDVXGkr6&format=png&color=000000" alt="">
-                <h2> Những triệu chứng bạn đã nhập:</h2>
+                <h2> Symptoms you entered:</h2>
                 <?php if (!empty($enteredSymptoms)): ?>
                     <p><?= implode(', ', array_map('htmlspecialchars', $enteredSymptoms)) ?></p>
                 <?php endif; ?>
             </div>
 
-            <h1> Đây là lời tư vấn của chúng tôi</h1>
+            <h1> This is the recommendation result from HEALMATE</h1>
 
             <div class="result-section">
                 <img class="result" src="https://img.icons8.com/?size=100&id=eStKiCvjHOv8&format=png&color=000000" alt="">
-                <h2> Tên bệnh:</h2>
+                <h2> Disease name:</h2>
                 <p><?= htmlspecialchars($diseaseName) ?></p>
             </div>
 
             <div class="result-section">
                 <img class="result" src="https://img.icons8.com/?size=100&id=g84XLRTaYw1k&format=png&color=000000" alt="">
-                <h2> Mô tả bệnh:</h2>
+                <h2> Disease Information:</h2>
                 <p><?= $diseaseInfo['description'] ?></p>
             </div>
 
             <div class="result-section">
                 <img class="result" src="https://img.icons8.com/?size=100&id=GFZarxtFIkhx&format=png&color=000000" alt="">
-                <h2> Mức độ nghiêm trọng:</h2>
+                <h2> Severity:</h2>
                 <?php if (!empty($symptomWeights)): ?>
                     <table class="symptomweights">
                         <tr>
-                            <th>Triệu chứng</th>
-                            <th>Trọng số (Trên thang 10)</th>
+                            <th>Symptoms</th>
+                            <th>Weight (on a scale of 10)</th>
                         </tr>
                         <?php foreach ($symptomWeights as $row): ?>
                             <tr>
@@ -210,7 +210,7 @@ if (!isset($_SESSION['user'])) {
 
             <div class="result-section">
                 <img class="result" src="https://img.icons8.com/?size=100&id=TdgoFB7uKPlI&format=png&color=000000" alt="Phòng ngừa">
-                <h2>Các biện pháp phòng ngừa:</h2>
+                <h2>Precautions:</h2>
                 <?php if (!empty($diseaseInfo['precautions'])): ?>
                     <ul>
                         <?php foreach ($diseaseInfo['precautions'] as $p): ?>
@@ -231,12 +231,12 @@ if (!isset($_SESSION['user'])) {
 
                 <div class="result-section">
                     <img class="result" src="https://img.icons8.com/?size=100&id=byMfPQ4nQ4lQ&format=png&color=000000" alt="Thuốc đề xuất">
-                    <h2>Các loại thuốc được gợi ý:</h2>
+                    <h2>Recommended medications:</h2>
                     <table class="medicine-table">
                         <thead>
                             <tr>
-                                <th>Tên/ Thành phần thuốc</th>
-                                <th>Tìm hiểu thêm</th>
+                                <th>Name / ingredients</th>
+                                <th>Learn more</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -245,7 +245,7 @@ if (!isset($_SESSION['user'])) {
                                     <td><?= htmlspecialchars(trim($med)) ?></td>
                                     <td>
                                         <a href="https://www.google.com/search?q=<?= urlencode(trim($med)) ?>" target="_blank">
-                                            Tìm kiếm ngay
+                                            Search now
                                         </a>
                                     </td>
                                 </tr>
@@ -257,14 +257,14 @@ if (!isset($_SESSION['user'])) {
             <?php if (!empty($matchingDrugs)): ?>
                 <div class="result-section">
                     <img class="result" src="https://img.icons8.com/?size=100&id=9shlfoGKqCS7&format=png&color=000000" alt="Các loại thuốc có trong HealMate">
-                    <h2>Các loại thuốc có ở HealMate:</h2>
+                    <h2>All medicine from HealMate:</h2>
                     <table class="medicine-table">
                         <thead>
                             <tr>
-                                <th>Tên thuốc</th>
-                                <th>Thành phần</th>
-                                <th>Hàm lượng</th>
-                                <th>Xem chi tiết</th>
+                                <th>Name</th>
+                                <th>Ingredients</th>
+                                <th>Content</th>
+                                <th>Details</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -274,7 +274,7 @@ if (!isset($_SESSION['user'])) {
                                     <td><?= htmlspecialchars($drug['ten_hoat_chat']) ?></td>
                                     <td><?= htmlspecialchars($drug['ham_luong']) ?></td>
                                     <td>
-                                        <a href="<?= htmlspecialchars($drug['url']) ?>" target="_blank">Xem</a>
+                                        <a href="<?= htmlspecialchars($drug['url']) ?>" target="_blank">Details</a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -284,7 +284,7 @@ if (!isset($_SESSION['user'])) {
             <?php endif; ?>
             <div class="result-section">
                 <img class="result" src="https://img.icons8.com/?size=100&id=3psXjDzSpADv&format=png&color=000000" alt="Chế độ sinh hoạt">
-                <h2>Chế độ sinh hoạt:</h2>
+                <h2>Lifestyle:</h2>
                 <?php if (!empty($diseaseInfo['workouts'])): ?>
                     <ul>
                         <?php foreach ($diseaseInfo['workouts'] as $w): ?>
@@ -301,8 +301,8 @@ if (!isset($_SESSION['user'])) {
             ?>
             <div class="result-section">
                 <img class="result" src="https://img.icons8.com/?size=100&id=35G9RMkkBBXc&format=png&color=000000" alt="">
-                <h2> Chế độ ăn uống:</h2>
-                <p><?= htmlspecialchars($diet ?? 'Không có') ?></p>
+                <h2> Diet:</h2>
+                <p><?= htmlspecialchars($diet ?? 'No') ?></p>
             </div>
         </div>
     </div>
@@ -315,11 +315,11 @@ if (!isset($_SESSION['user'])) {
 
         function logout() {
             Swal.fire({
-                title: 'Bạn có chắc muốn đăng xuất?',
+                title: 'Do you want to logout?',
                 icon: 'warning',
                 showCancelButton: true,
-                cancelButtonText: 'Không',
-                confirmButtonText: 'Có',
+                cancelButtonText: 'No',
+                confirmButtonText: 'Yes',
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
                 reverseButtons: true

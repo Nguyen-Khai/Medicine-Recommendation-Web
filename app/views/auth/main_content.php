@@ -351,7 +351,7 @@
 <div id="fullpage">
     <div class="section  section1">
         <img class="section_1" src="assets/images/consultant.png" alt="">
-        <h1 class="section_1">Bạn muốn tư vấn sức khỏe<br>ngay bây giờ?</h1>
+        <h1 class="section_1">Do you want a health advice right now?</h1>
         <button onclick="location.href='index.php?route=recommendation'" class="section_1">Tư vấn ngay</button>
         <div class="circle circle1"></div>
         <div class="circle circle2"></div>
@@ -360,7 +360,7 @@
     </div>
     <div class="section section2">
         <div class="container st2">
-            <h2 class="st2-title"> Kiến thức sức khỏe</h2>
+            <h2 class="st2-title"> Health Knownledge</h2>
             <div class="health-article">
                 <a href="https://vnexpress.net/cach-cham-soc-nguoi-cao-tuoi-tai-nha-123456.html" target="_blank" rel="noopener noreferrer">
                     <h3 class="article-title">Tác động của giấc ngủ đến sức khỏe tinh thần</h3>
@@ -387,14 +387,14 @@
         </div>
     </div>
     <div class="section section3">
-        <h2 class="st3">Trợ lý sức khoẻ cá nhân</h2>
-        <p class="st3">Hỏi tôi bất kỳ điều gì về sức khỏe, thuốc men, chỉ số cơ thể v.v...</p>
+        <h2 class="st3">My health assistant</h2>
+        <p class="st3">ask me anything about health, medicine,...</p>
 
         <div class="chatbox">
             <div class="chat-messages" id="chat-messages"></div>
             <form class="chat-input" onsubmit="sendMessage(event)">
-                <input type="text" id="user-input" placeholder="Nhập câu hỏi..." required />
-                <button type="submit">Gửi</button>
+                <input type="text" id="user-input" placeholder="Type in your question..." required />
+                <button type="submit">Send</button>
             </form>
         </div>
     </div>
@@ -402,24 +402,24 @@
         <footer class="site-footer">
             <div class="footer-container">
                 <div class="footer-section about">
-                    <h3>Về chúng tôi</h3>
-                    <p>Website cung cấp thông tin, tư vấn và gợi ý về sức khỏe đáng tin cậy cho cộng đồng. Không thay thế chẩn đoán y tế chuyên môn.</p>
+                    <h3>About us</h3>
+                    <p>This website provides reliable health information, advice and suggestions to the community. Not a substitute for professional medical diagnosis.</p>
                 </div>
 
                 <div class="footer-section contact">
-                    <h3>Liên hệ</h3>
+                    <h3>Contact</h3>
                     <p>Email: HealMate.info@gmail.com</p>
                     <p>Hotline: 1900 123 456</p>
                 </div>
 
                 <div class="footer-section social">
-                    <h3>Kết nối với chúng tôi</h3>
+                    <h3>Connect with us</h3>
                     <a href="#"><img src="https://img.icons8.com/ios-filled/24/facebook-new.png" alt="Facebook" /></a>
                     <a href="#"><img src="https://img.icons8.com/ios-filled/24/instagram-new.png" alt="Instagram" /></a>
                     <a href="#"><img src="https://img.icons8.com/ios-filled/24/youtube-play.png" alt="YouTube" /></a>
                 </div>
                 <div class="footer-bottom">
-                    <p>© 2025 HealMate. Mọi quyền được bảo lưu.</p>
+                    <p>© 2025 HealMate. All rights reserved.</p>
                 </div>
         </footer>
     </div>

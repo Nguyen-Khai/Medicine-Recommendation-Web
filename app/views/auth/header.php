@@ -319,7 +319,7 @@ $avatarSrc = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'asse
     }
 </style>
 <div class="slogan-container">
-    <div class="slogan">Thông tin được cung cấp trên trang web này chỉ mang tính chất tham khảo và không thay thế cho chẩn đoán, tư vấn hoặc điều trị y tế từ các chuyên gia có thẩm quyền.</div>
+    <div class="slogan">The information provided on this website is for reference only and is not a substitute for diagnosis, medical advice or treatment from competent professionals.</div>
 </div>
 <header class="main-header">
     <div class="logo">
@@ -328,10 +328,10 @@ $avatarSrc = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'asse
     </div>
     <nav class="main-nav">
         <ul>
-            <li><a href="index.php?route=home">Trang chủ</a></li>
-            <li><a href="index.php?route=introduction">Giới thiệu</a></li>
-            <li><a href="index.php?route=medicine_cabinet">Tủ thuốc</a></li>
-            <li><a href="index.php?route=recommendation">Tư vấn</a></li>
+            <li><a href="index.php?route=home">Home</a></li>
+            <li><a href="index.php?route=introduction">Introduction</a></li>
+            <li><a href="index.php?route=medicine_cabinet">Medicine cabinet</a></li>
+            <li><a href="index.php?route=recommendation">Recommendation</a></li>
         </ul>
 
         <!-- Nút mở tìm kiếm -->
@@ -340,17 +340,17 @@ $avatarSrc = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'asse
         <!-- Sidebar tìm kiếm -->
         <div id="searchSidebar" class="search-sidebar">
             <button id="closeSearchBtn" class="close-btn">&times;</button>
-            <input type="text" id="searchInput" placeholder="Nhập từ khóa tìm kiếm..." autocomplete="off" />
+            <input type="text" id="searchInput" placeholder="Enter search keywords..." autocomplete="off" />
             <div id="suggestions" class="autocomplete-box"></div>
-            <button class="search">Tìm kiếm</button>
+            <button class="search">Search</button>
         </div>
         <div class="avatar-dropdown">
             <img src="<?= $avatarSrc ?>" alt="Avatar" class="avatar" onclick="toggleDropdown()">
             <div class="dropdown-menu" id="dropdown-menu">
-                <a href="index.php?route=profile#profile">Thông tin cá nhân</a>
-                <a href="#" onclick="logout()">Đăng xuất</a>
+                <a href="index.php?route=profile#profile">My information</a>
+                <a href="#" onclick="logout()">Logout</a>
             </div>
-            <h2 class="name">Chào <?= htmlspecialchars($_SESSION['user']['name']) ?>!</h2>
+            <h2 class="name">Hello <?= htmlspecialchars($_SESSION['user']['name']) ?>!</h2>
         </div>
     </nav>
 </header>
@@ -362,13 +362,13 @@ $avatarSrc = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'asse
 
     function logout() {
         Swal.fire({
-            title: 'Bạn có chắc muốn đăng xuất?',
+            title: 'Do you want to exit?',
             imageUrl: 'assets/images/question_mask.png', // ảnh bạn muốn dùng
             imageWidth: 150,
             imageHeight: 150,
             showCancelButton: true,
-            cancelButtonText: 'Không',
-            confirmButtonText: 'Có',
+            cancelButtonText: 'No',
+            confirmButtonText: 'Yes',
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
             reverseButtons: true

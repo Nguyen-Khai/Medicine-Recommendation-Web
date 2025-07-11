@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Giới thiệu</title>
+    <title>Introduction</title>
     <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather&display=swap">
@@ -267,16 +267,16 @@
                 <h1 class="logo_st1">HealMate</h1>
             </div>
             <p>
-                HealMate là nền tảng trực tuyến giúp bạn tiếp cận nhanh chóng các thông tin, lời khuyên y tế đáng tin cậy.
-                Chúng tôi cung cấp những giải pháp và hướng dẫn chăm sóc sức khỏe phù hợp với nhu cầu cá nhân của bạn.
+                HealMate is an online platform that provides you with quick access to reliable information, advice and guidance.
+We provide healthcare solutions and guidance tailored to your individual needs.
             </p>
             <hr class="divider" />
             <p>
-                Với sự hỗ trợ từ công nghệ hiện đại, website của chúng tôi cam kết mang đến trải nghiệm tìm kiếm thông tin y tế dễ dàng, an toàn và hiệu quả.
+                With the support of modern technology, our website is committed to providing an easy, safe and effective medical information search experience.
             </p>
             <hr class="divider" />
             <p>
-                Dù bạn đang tìm hiểu về các triệu chứng bệnh, chế độ dinh dưỡng, hay cách phòng ngừa bệnh tật, Gợi ý Y tế luôn sẵn sàng đồng hành cùng bạn trên con đường chăm sóc sức khỏe.
+                Whether you're learning about symptoms, nutrition, or disease prevention, Health Tips is here to help you on your journey to wellness.
             </p>
             <div class="circle circle1"></div>
             <div class="circle circle2"></div>
@@ -284,12 +284,12 @@
             <div class="circle circle4"></div>
         </div>
         <div class="section">
-            <h3>Điểm nổi bật của chúng tôi</h3>
+            <h3>Our strengths</h3>
             <ul class="multi-column-list">
-                <li>Thông tin cập nhật, chính xác từ các nguồn uy tín.</li>
-                <li>Giao diện thân thiện, dễ sử dụng trên mọi thiết bị.</li>
-                <li>Tư vấn cá nhân hóa dựa trên dữ liệu và chuyên môn y tế.</li>
-                <li>Hỗ trợ 24/7.</li>
+                <li>Updated, accurate information from reputable sources.</li>
+                <li>Friendly interface, easy to use on all devices.</li>
+                <li>Personalized advice based on data and medical expertise.</li>
+                <li>24/7 Support.</li>
             </ul>
             <div class="circle-container" style="position: relative;">
                 <div class="circle_st2 circle1"></div>

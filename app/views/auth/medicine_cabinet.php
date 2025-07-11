@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tủ thuốc</title>
+    <title>Medicine cabinet</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather&display=swap">
     <style>
         body {
@@ -179,7 +179,7 @@
     <div class="circle circle3"></div>
     <div class="circle circle4"></div>
     <div class="section">
-        <h2 class="st2-title">Tủ thuốc của HEALMATE</h2>
+        <h2 class="st2-title">HEALMATE's medicine cabinet</h2>
         <?php if (!empty($medicines)): ?>
             <ul id="article-list">
                 <?php foreach ($medicines as $med): ?>
@@ -187,16 +187,16 @@
                         <div class="health-article">
                             <h3 class="article-title"><?= htmlspecialchars($med['ten_thuoc']) ?></h3>
                             <div class="article-meta">
-                                <div class="info-line"><strong>Thành phần:</strong> <?= htmlspecialchars($med['ten_hoat_chat']) ?></div>
-                                <div class="info-line"><strong>Hàm lượng:</strong> <?= htmlspecialchars($med['ham_luong']) ?></div>
+                                <div class="info-line"><strong>Ingredient:</strong> <?= htmlspecialchars($med['ten_hoat_chat']) ?></div>
+                                <div class="info-line"><strong>Content:</strong> <?= htmlspecialchars($med['ham_luong']) ?></div>
                             </div>
-                            <a href="<?= htmlspecialchars($med['url']) ?>" target="_blank">Tìm hiểu thêm</a>
+                            <a href="<?= htmlspecialchars($med['url']) ?>" target="_blank">Learn more</a>
                         </div>
                     </li>
                 <?php endforeach; ?>
             </ul>
         <?php else: ?>
-            <p>Không có thuốc nào trong hệ thống.</p>
+            <p>There's no medicine in the system</p>
         <?php endif; ?>
         <div id="pagination" class="pagination-controls"></div>
     </div>

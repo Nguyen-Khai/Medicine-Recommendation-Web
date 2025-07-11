@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Form Đăng Nhập / Đăng Ký</title>
+    <title>Login / Register</title>
     <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather&display=swap">
     <style>
@@ -383,7 +383,7 @@
     <div class="ng-nhp">
         <div class="tab-container" id="tabContainer">
             <div class="tab login-tab active" onclick="switchTab('login')">Login</div>
-            <div class="tab register-tab" onclick="switchTab('register')">Đăng ký</div>
+            <div class="tab register-tab" onclick="switchTab('register')">Register</div>
             <img class="pill-icon" src="assets/images/image-1.png" />
         </div>
 
@@ -409,7 +409,7 @@
                         <label>Username</label>
                     </div>
                     <div class="forgot_password">
-                        <a class="forgot_password" href="index.php?route=forgot_password">Quên mật khẩu?</a>
+                        <a class="forgot_password" href="index.php?route=forgot_password">Forgot Password?</a>
                     </div>
                     <div class="login">
                         <input type="password" id="login-password" name="password" required />
@@ -420,7 +420,7 @@
                     </div>
                     <div class="remember-me">
                         <input type="checkbox" id="remember" name="remember" />
-                        <label class="remember" for="remember">Nhớ mật khẩu</label>
+                        <label class="remember" for="remember">Remember Password</label>
                     </div>
                     <button>Login</button>
                 </form>
@@ -444,11 +444,11 @@
                             </div>
                             <div class="login">
                                 <input type="text" name="nameuser" required />
-                                <label>Họ tên</label>
+                                <label>Full Name</label>
                             </div>
                             <div class="login">
                                 <input type="date" name="dob" required />
-                                <label class="date">Ngày sinh</label>
+                                <label class="date">Birthday</label>
                             </div>
                             <div class="gender-group">
                                 <label>Gender</label>
@@ -474,14 +474,14 @@
                             </div>
                             <div class="login password-wrapper">
                                 <input type="password" id="confirm-password" name="confirm-password" required />
-                                <label>Nhập lại mật khẩu</label>
+                                <label>Confirm Password</label>
                                 <span type="button" class="toggle-password" onclick="togglePassword('confirm-password', this)">
                                     <img src="assets/images/close eye.png" alt="Hiện mật khẩu" class="eye-icon" />
                                 </span>
                             </div>
                         </div>
                     </div>
-                    <button class="button_register">Đăng ký</button>
+                    <button class="button_register">Register</button>
                 </form>
                 <img class="img_re" src="assets/images/nurses.png" />
                 <img class="img_box_re" src="assets/images/patient records.png" />

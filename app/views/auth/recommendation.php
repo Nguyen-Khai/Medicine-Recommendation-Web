@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tư vấn</title>
+    <title>Recommendation</title>
     <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather&display=swap">
@@ -167,16 +167,16 @@
     ?>
     <!-- Nội dung chính -->
     <div class="recommendation">
-        <h1 class="recommendation">Bạn đang cảm thấy thế nào?</h1>
-        <p class="recommendation">Hãy cho chúng tôi biết sức khỏe bạn đang thế nào nhé!</p>
+        <h1 class="recommendation">How do you feel?</h1>
+        <p class="recommendation">Please tell us about your health status!</p>
         <div class="container-forms">
             <div id="login-form" class="form-section active-form">
                 <form action="index.php?route=diagnose" method="POST">
                     <div class="recommendation">
                         <input type="text" name="symptoms" id="symptom" required />
-                        <label>Triệu chứng</label>
+                        <label>Symptoms</label>
                     </div>
-                    <button class="recommendation">Gửi</button>
+                    <button class="recommendation">Send</button>
                 </form>
                 <div class="light-effect">
                     <div class="glow-circle"></div>

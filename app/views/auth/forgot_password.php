@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Quên mật khâu</title>
+  <title>Forgot password</title>
   <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather&display=swap">
   <style>
@@ -176,8 +176,8 @@
         <img class="logo" src="assets/images/logo.png" alt="">
         <h1 class="logo">HealMate</h1>
       </div>
-      <h2>Quên mật khẩu?</h2>
-      <p>Hãy điền tên đăng nhập và email gắn với tài khoản của bạn. Chúng tôi sẽ gửi mã xác nhận đến email của bạn!</p>
+      <h2>Forgot password?</h2>
+      <p>Please enter your username and email associated with your account. We will send a confirmation code to your email!</p>
       <div id="register-form">
         <?php if (!empty($_SESSION['error'])): ?>
           <p style="color: #F95454; margin-bottom: 10px; font-weight: bold; position: relative; top: -13px;"><?= $_SESSION['error'];
@@ -196,7 +196,7 @@
             <input type="email" name="email" required />
             <label class="email">Email</label>
           </div>
-          <button>Gửi liên kết</button>
+          <button>Send link</button>
         </form>
       </div>
       <img src="assets/images/forgot password.png" class="img_re" />
