@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather&display=swap">
     <style>
         body {
-            font-family: 'Merriweather', serif;
+            font-family: 'Inter';
             margin: 0;
             padding: 20px;
         }

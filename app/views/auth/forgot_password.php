@@ -15,7 +15,7 @@
     }
 
     body {
-      font-family: 'Merriweather', serif;
+      font-family: 'Inter';
       background: linear-gradient(270deg,
           rgba(119, 205, 255, 1) 0%,
           rgba(174, 225, 254, 1) 33%,
@@ -92,7 +92,6 @@
       border-radius: 5px;
       font-size: 18px;
       padding-top: 20px;
-      font-family: 'Merriweather', serif;
     }
 
     label {
@@ -128,7 +127,6 @@
       color: white;
       font-size: 18px;
       cursor: pointer;
-      font-family: 'Merriweather', serif;
       position: relative;
       top: 15px;
     }
@@ -196,7 +194,7 @@
             <input type="email" name="email" required />
             <label class="email">Email</label>
           </div>
-          <button>Send link</button>
+          <button>Send code</button>
         </form>
       </div>
       <img src="assets/images/forgot password.png" class="img_re" />

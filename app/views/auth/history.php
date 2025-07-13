@@ -20,6 +20,7 @@ $model = new DiseaseModel();
         background: linear-gradient(270deg, #F95454, #F5C45E, #FE7743, #328E6E, #4DA8DA, #AA60C8);
         background-size: 1000% 1000%;
         animation: waveGradient 20s ease infinite;
+        font-family: 'Inter';
     }
 
     @keyframes waveGradient {
@@ -48,7 +49,6 @@ $model = new DiseaseModel();
     .result-container h1 {
         text-align: center;
         font-size: 26px;
-        ;
         margin-bottom: 22px;
         position: relative;
         top: -6px;

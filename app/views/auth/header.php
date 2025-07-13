@@ -14,7 +14,7 @@ $avatarSrc = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'asse
 <style>
     body {
         margin: 0;
-        font-family: 'Merriweather', serif;
+        font-family: 'Inter';
         padding-top: 150px;
     }
 
@@ -85,7 +85,6 @@ $avatarSrc = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'asse
     nav.main-nav {
         display: flex;
         align-items: center;
-        gap: 20px;
         position: absolute;
         right: 250px;
     }
@@ -93,7 +92,7 @@ $avatarSrc = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'asse
     nav.main-nav ul {
         list-style: none;
         display: flex;
-        gap: 30px;
+        gap: 20px;
         padding: 0;
         margin: 0;
     }
@@ -184,7 +183,6 @@ $avatarSrc = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'asse
         background: white;
         font-size: 16px;
         cursor: pointer;
-        font-family: 'Merriweather', serif;
         padding: 8px 16px;
         transition: all 0.3s ease;
     }
@@ -215,7 +213,6 @@ $avatarSrc = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'asse
         color: white;
         font-size: 16px;
         cursor: pointer;
-        font-family: 'Merriweather', serif;
         padding: 8px 16px;
         transition: all 0.3s ease;
     }

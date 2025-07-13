@@ -109,30 +109,37 @@ class DiseaseModel
     //Tìm kiếm
     public function searchDrugSuggestions(string $query): array
     {
-        if (trim($query) === '') return [];
+        // 1. Lọc sạch từ khóa đầu vào
+        $cleanedQuery = preg_replace('/[^a-z0-9\s\-]/i', '', strtolower(trim($query)));
 
-        $keyword = strtolower(trim($query));
+        if ($cleanedQuery === '') return [];
 
-        // 1. Truy vấn tất cả dữ liệu phù hợp
-        $searchTerm = '%' . $keyword . '%';
+        $searchTerm = '%' . $cleanedQuery . '%';
 
-        $stmt = $this->pdo->prepare("SELECT DISTINCT ten_thuoc AS name FROM drugs WHERE LOWER(ten_thuoc) LIKE ?
-                                            UNION
-                                            SELECT DISTINCT ten_hoat_chat AS name FROM active_ingredients WHERE LOWER(ten_hoat_chat) LIKE ?");
+        // 2. Truy vấn DB
+        $stmt = $this->pdo->prepare("
+        SELECT DISTINCT ten_thuoc AS name 
+        FROM drugs 
+        WHERE LOWER(ten_thuoc) LIKE ?
+        UNION
+        SELECT DISTINCT ten_hoat_chat AS name 
+        FROM active_ingredients 
+        WHERE LOWER(ten_hoat_chat) LIKE ?
+    ");
         $stmt->execute([$searchTerm, $searchTerm]);
         $results = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-        // 2. Ưu tiên kết quả bắt đầu bằng keyword, sau đó là chứa keyword, rồi gần giống
+        // 3. Ưu tiên sắp xếp
         $sorted = [];
         foreach ($results as $item) {
             $lower = strtolower($item);
 
-            if (strpos($lower, $keyword) === 0) {
+            if (strpos($lower, $cleanedQuery) === 0) {
                 $sorted[] = ['score' => 3, 'value' => $item];
-            } elseif (strpos($lower, $keyword) !== false) {
+            } elseif (strpos($lower, $cleanedQuery) !== false) {
                 $sorted[] = ['score' => 2, 'value' => $item];
             } else {
-                similar_text($lower, $keyword, $percent);
+                similar_text($lower, $cleanedQuery, $percent);
                 if ($percent > 50) {
                     $sorted[] = ['score' => 1, 'value' => $item];
                 }
@@ -140,22 +147,32 @@ class DiseaseModel
         }
 
         usort($sorted, fn($a, $b) => $b['score'] <=> $a['score']);
-        return array_slice(array_column($sorted, 'value'), 0, 10); // Trả về tối đa 10 gợi ý
+        return array_slice(array_column($sorted, 'value'), 0, 10);
     }
-    //Kết quả tìm kiếm
-    public function searchDrugsWithDetails(string $keyword): array
-    {
-        $keyword = '%' . strtolower($keyword) . '%';
 
-        $stmt = $this->pdo->prepare("SELECT DISTINCT d.ten_thuoc, a.ten_hoat_chat, a.ham_luong, d.url
-                                            FROM drugs d
-                                            JOIN active_ingredients a ON d.id = a.drug_id
-                                            WHERE LOWER(d.ten_thuoc) LIKE ? OR LOWER(a.ten_hoat_chat) LIKE ?
-                                            LIMIT 50");
-        $stmt->execute([$keyword, $keyword]);
+    //Kết quả tìm kiếm
+    public function searchDrugsWithDetails(string $query): array
+    {
+        // 1. Làm sạch từ khóa người dùng nhập
+        $keyword = preg_replace('/[^a-z0-9\s\-]/i', '', strtolower(trim($query)));
+
+        if ($keyword === '') return [];
+
+        $searchTerm = '%' . $keyword . '%';
+
+        // 2. Thực hiện truy vấn chi tiết
+        $stmt = $this->pdo->prepare("
+        SELECT DISTINCT d.ten_thuoc, a.ten_hoat_chat, a.ham_luong, d.url
+        FROM drugs d
+        JOIN active_ingredients a ON d.id = a.drug_id
+        WHERE LOWER(d.ten_thuoc) LIKE ? OR LOWER(a.ten_hoat_chat) LIKE ?
+        LIMIT 50
+    ");
+        $stmt->execute([$searchTerm, $searchTerm]);
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
 
     // Lưu lịch sử người dùng
     public function saveUserHistory(array $data)

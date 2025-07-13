@@ -16,7 +16,7 @@ $base64 = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'default
     <style>
         body {
             margin: 0;
-            font-family: 'Merriweather', serif;
+            font-family: 'Inter';
             padding-top: 150px;
             background: linear-gradient(to bottom, #3A59D1, #1B56FD, #0D92F4, #60B5FF, #77CDFF, #3A59D1);
             background-size: 100% 1000%;
@@ -223,13 +223,14 @@ $base64 = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'default
         }
 
         .password-form input {
-            height: 45px;
+            height: 40px;
             width: 400px;
-            border: 1px solid #aaa;
-            border-radius: 5px;
-            font-size: 18px;
-            font-family: 'Merriweather', serif;
             outline: none;
+            border: 1px solid #aaa;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 15px;
+            padding-top: 20px;
         }
 
         .password-form input:focus {
@@ -299,6 +300,25 @@ $base64 = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'default
         .eye-icon {
             pointer-events: none;
             /* Để không chặn sự kiện click */
+        }
+
+        .password-strength {
+            font-size: 14px;
+            margin-top: 6px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .password-strength.weak {
+            color: #e74c3c;
+        }
+
+        .password-strength.medium {
+            color: #f39c12;
+        }
+
+        .password-strength.strong {
+            color: #2ecc71;
         }
 
         /*Lịch sử tìm kiếm*/
@@ -430,7 +450,6 @@ $base64 = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'default
         input {
             max-width: 400px;
             outline: none;
-            font-family: 'Merriweather', serif;
         }
 
         input:focus {
@@ -524,11 +543,11 @@ $base64 = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'default
                 <h2>Change password</h2>
                 <?php if (!empty($_SESSION['error'])): ?>
                     <p style="color: #F95454; margin-bottom: 10px; font-weight: bold; position: relative; left: 94px; bottom: 11px;"><?= $_SESSION['error'];
-                                            unset($_SESSION['error']); ?></p>
+                                                                                                                                        unset($_SESSION['error']); ?></p>
                 <?php endif; ?>
                 <?php if (!empty($_SESSION['success'])): ?>
                     <p style="color:green; margin-bottom: 10px; font-weight: bold; position: relative; left: 94px; bottom: 11px;"><?= $_SESSION['success'];
-                                            unset($_SESSION['success']); ?></p>
+                                                                                                                                    unset($_SESSION['success']); ?></p>
                 <?php endif; ?>
                 <form class="password-form" method="POST" action="index.php?route=change-password">
                     <div class="form-group">
@@ -544,6 +563,7 @@ $base64 = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'default
                         <span type="button" class="toggle-password" onclick="togglePassword('new-password', this)">
                             <img src="assets/images/close eye.png" alt="Hiện mật khẩu" class="eye-icon" />
                         </span>
+                        <div id="password-strength" class="password-strength"></div>
                     </div>
                     <div class="form-group">
                         <input type="password" id="confirm-password" name="confirm-password" required />
@@ -593,7 +613,7 @@ $base64 = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'default
                         <?php foreach ($userHistories as $record): ?>
                             <li>
                                 <?= htmlspecialchars($record['predicted_disease']) ?> –
-                                recommend at <?= date('H:i \n\g\à\y d/m/Y', strtotime($record['created_at'])) ?>
+                                recommend at <?= date('H:i d/m/Y', strtotime($record['created_at'])) ?>
                                 <a href="index.php?route=history-detail&id=<?= $record['id'] ?>" class="detail-link">Details</a>
                             </li>
                         <?php endforeach; ?>
@@ -707,6 +727,54 @@ $base64 = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'default
                 img.alt = "Hiện mật khẩu";
             }
         }
+
+
+        //Độ mạnh yếu mật khẩu
+        function togglePassword(id, element) {
+            const input = document.getElementById(id);
+            const icon = element.querySelector('img');
+            if (input.type === "password") {
+                input.type = "text";
+                icon.src = "assets/images/open eye.png";
+            } else {
+                input.type = "password";
+                icon.src = "assets/images/close eye.png";
+            }
+        }
+
+        document.getElementById('new-password').addEventListener('input', function() {
+            const value = this.value;
+            const strengthDisplay = document.getElementById('password-strength');
+            let strength = 0;
+
+            if (value.length >= 6) strength++;
+            if (/[A-Z]/.test(value)) strength++;
+            if (/[0-9]/.test(value)) strength++;
+            if (/[^A-Za-z0-9]/.test(value)) strength++;
+
+            if (value.length === 0) {
+                strengthDisplay.textContent = '';
+                strengthDisplay.className = 'password-strength';
+                return;
+            }
+
+            switch (strength) {
+                case 0:
+                case 1:
+                    strengthDisplay.textContent = "Strength: Weak";
+                    strengthDisplay.className = "password-strength weak";
+                    break;
+                case 2:
+                case 3:
+                    strengthDisplay.textContent = "Strength: Medium";
+                    strengthDisplay.className = "password-strength medium";
+                    break;
+                case 4:
+                    strengthDisplay.textContent = "Strength: Strong";
+                    strengthDisplay.className = "password-strength strong";
+                    break;
+            }
+        });
     </script>
 </body>
 

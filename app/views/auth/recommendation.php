@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -12,19 +13,19 @@
 <style>
     /*Main*/
     h1.recommendation {
-        font-family: 'Merriweather', serif;
+        font-family: 'Inter';
         font-size: 50px;
         position: relative;
         top: -24px;
-        left: 310px;
+        left: 458px;
         width: 672px;
         color: #F95454;
     }
 
     p.recommendation {
         position: absolute;
-        top: 40px;
-        left: 430px;
+        top: 33px;
+        left: 519px;
     }
 
     .container-forms {
@@ -60,7 +61,7 @@
     }
 
     .recommendation input {
-        height: 60px;
+        height: 40px;
         width: 400px;
         outline: none;
         border: 1px solid black;
@@ -68,7 +69,7 @@
         border-radius: 5px;
         font-size: 18px;
         padding-top: 20px;
-        font-family: 'Merriweather', serif;
+        font-family: 'Inter';
     }
 
     label {
@@ -91,7 +92,7 @@
     .recommendation input:valid+label {
         top: 13px;
         font-size: 15px;
-        font-weight: 500;
+        font-weight: 100;
         color: #1e90ff;
     }
 
@@ -104,7 +105,7 @@
         color: white;
         font-size: 16px;
         cursor: pointer;
-        font-family: 'Merriweather', serif;
+        font-family: 'Inter';
         padding: 8px 16px;
         transition: all 0.3s ease;
         margin-top: 10px;
@@ -163,7 +164,7 @@
 
 <body>
     <?php
-        include('header.php')
+    include('header.php')
     ?>
     <!-- Nội dung chính -->
     <div class="recommendation">

@@ -25,12 +25,11 @@
     }
 
     h1.section_1 {
-        font-family: 'Merriweather', serif;
-        font-size: 50px;
+        font-family: 'Inter';
+        font-size: 43px;
         position: relative;
-        top: 100px;
         right: 10px;
-        top: 200px;
+        top: 246px;
     }
 
     img.section_1 {
@@ -38,7 +37,8 @@
         float: left;
         position: relative;
         left: 10px;
-        top: 200px;
+        top: 222px;
+        z-index: 1;
     }
 
     button.section_1 {
@@ -50,12 +50,12 @@
         color: white;
         font-size: 20px;
         cursor: pointer;
-        font-family: 'Merriweather', serif;
+        font-family: 'Inter';
         padding: 8px 16px;
         transition: all 0.3s ease;
-        width: 155px;
+        width: 203px;
         height: 50px;
-        top: 200px;
+        top: 235px;
     }
 
     button.section_1:hover {
@@ -292,33 +292,57 @@
                 rgba(174, 225, 254, 1) 33%,
                 rgba(191, 231, 254, 1) 63%,
                 rgba(226, 243, 253, 1) 100%);
+        background-size: cover;
     }
 
     .site-footer {
         color: #333;
         padding: 40px 20px 20px;
-        font-family: Arial, sans-serif;
+        font-family: 'Inter';
         position: relative;
         top: 100px;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .site-footer.visible {
+        opacity: 1;
+        transform: translateY(0);
     }
 
     .footer-container {
-        display: grid;
-        max-width: 1100px;
-        margin: auto;
+        background-color: rgba(255, 255, 255, 0.75);
+        border-radius: 12px;
+        padding: 14px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(8px);
     }
 
+
     .footer-section h3 {
-        font-size: 25px;
-        margin-bottom: 10px;
-        color: #333;
+        font-size: 22px;
+        font-weight: 600;
+        color: #F95454;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        letter-spacing: 0.5px;
     }
 
     .footer-section p,
     .footer-section ul {
         font-size: 15px;
         line-height: 1.6;
-        color: #333;
+        color: #444;
+        text-shadow: 0.5px 0.5px 1px rgba(0, 0, 0, 0.08);
+    }
+
+    .footer-bottom {
+        text-align: center;
+        padding-top: 20px;
+        font-size: 13px;
+        border-top: 1px solid #000;
+        margin-top: 15px;
+        text-shadow: 0.5px 0.5px 1px rgba(0, 0, 0, 0.1);
     }
 
     .footer-section ul {
@@ -328,8 +352,15 @@
 
     .footer-section ul li a {
         text-decoration: none;
-        transition: color 0.3s;
+        transition: color 0.3s ease;
+        color: #333;
     }
+
+    .footer-section ul li a:hover {
+        color: #1e90ff;
+        text-shadow: 0 0 3px rgba(30, 144, 255, 0.3);
+    }
+
 
     .footer-section img {
         margin-right: 10px;
@@ -339,20 +370,12 @@
     .footer-section img:hover {
         transform: scale(1.1);
     }
-
-    .footer-bottom {
-        text-align: center;
-        padding-top: 20px;
-        font-size: 13px;
-        border-top: 1px solid #000;
-        margin-top: 15px;
-    }
 </style>
 <div id="fullpage">
     <div class="section  section1">
         <img class="section_1" src="assets/images/consultant.png" alt="">
         <h1 class="section_1">Do you want a health advice right now?</h1>
-        <button onclick="location.href='index.php?route=recommendation'" class="section_1">Tư vấn ngay</button>
+        <button onclick="location.href='index.php?route=recommendation'" class="section_1">Recommend now</button>
         <div class="circle circle1"></div>
         <div class="circle circle2"></div>
         <div class="circle circle3"></div>
@@ -465,4 +488,22 @@
         if (text.includes("huyết áp")) return "Hãy đo huyết áp thường xuyên và ghi lại chỉ số.";
         return "Xin lỗi, tôi chưa hiểu rõ. Bạn có thể hỏi về sức khoẻ, thuốc, hoặc chế độ dinh dưỡng.";
     }
+
+    //fade-in
+    document.addEventListener("DOMContentLoaded", function () {
+        const footer = document.querySelector(".site-footer");
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    footer.classList.add("visible");
+                    observer.unobserve(entry.target); // Chỉ thực hiện 1 lần
+                }
+            });
+        }, {
+            threshold: 0.2
+        });
+
+        observer.observe(footer);
+    });
 </script>

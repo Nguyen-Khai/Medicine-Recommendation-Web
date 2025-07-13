@@ -15,7 +15,7 @@
         }
 
         body {
-            font-family: 'Merriweather', serif;
+            font-family: 'Inter';
             background: linear-gradient(270deg,
                     rgba(119, 205, 255, 1) 0%,
                     rgba(174, 225, 254, 1) 33%,
@@ -66,9 +66,9 @@
             justify-content: center;
             align-items: center;
             position: relative;
-            gap: 80px;
-            font-size: 40px;
-            font-family: 'Merriweather', serif;
+            font-size: 30px;
+            font-weight: 600;
+            gap: 60px;
             margin-bottom: 40px;
         }
 
@@ -84,14 +84,14 @@
 
         .pill-icon {
             position: absolute;
-            left: 54%;
+            left: 55%;
             transform: translateX(-110px);
             transition: transform 0.5s ease;
-            width: 52px;
+            width: 36px;
         }
 
         .tab-container.register-active .pill-icon {
-            transform: translateX(158px);
+            transform: translateX(58px);
         }
 
         .container-forms {
@@ -136,9 +136,8 @@
             border: 1px solid black;
             padding: 10px;
             border-radius: 5px;
-            font-size: 18px;
+            font-size: 15px;
             padding-top: 20px;
-            font-family: 'Merriweather', serif;
         }
 
         label {
@@ -174,7 +173,6 @@
             color: white;
             font-size: 18px;
             cursor: pointer;
-            font-family: 'Merriweather', serif;
             position: relative;
             top: 30px;
         }
@@ -188,7 +186,6 @@
             color: white;
             font-size: 18px;
             cursor: pointer;
-            font-family: 'Merriweather', serif;
             position: relative;
             top: -20px;
         }
@@ -363,7 +360,6 @@
         }
 
         @media (max-width: 768px) {
-
             .ng-nhp .img,
             img.img_box,
             img.img_re,
