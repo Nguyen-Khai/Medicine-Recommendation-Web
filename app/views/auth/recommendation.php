@@ -14,17 +14,17 @@
     /*Main*/
     h1.recommendation {
         font-family: 'Inter';
-        font-size: 50px;
+        font-size: 44px;
         position: relative;
         top: -24px;
-        left: 458px;
+        left: 476px;
         width: 672px;
         color: #F95454;
     }
 
     p.recommendation {
         position: absolute;
-        top: 33px;
+        top: 23px;
         left: 519px;
     }
 

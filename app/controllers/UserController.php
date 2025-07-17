@@ -3,10 +3,10 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require_once '../vendor/autoload.php'; // hoặc đường dẫn đến PHPMailer/autoload.php nếu bạn tải tay
+require_once '../vendor/autoload.php';
 
 class UserController
-{
+{   
     public static function login()
     {
         include '../app/views/auth/login.php';
@@ -57,7 +57,7 @@ class UserController
                 include '../app/views/auth/home.php';
                 exit();
             } else {
-                $error = "Sai tài khoản hoặc mật khẩu!";
+                $error = "Incorrect username or password!";
                 include '../app/views/auth/login.php';
             }
         }
@@ -80,7 +80,7 @@ class UserController
 
             // Kiểm tra mật khẩu khớp
             if ($password !== $confirm) {
-                $error = "Mật khẩu không khớp!";
+                $error = "Passwords do not match!";
                 include '../app/views/auth/login.php';
                 return;
             }
@@ -93,13 +93,13 @@ class UserController
 
             try {
                 $stmt->execute([$username, $name, $email, $hashedPassword, $birthday, $gender]);
-                $success = "Đăng ký thành công! Bạn có thể đăng nhập.";
+                $success = "Registration successful! You can now log in.";
                 include '../app/views/auth/login.php';
             } catch (PDOException $e) {
                 if ($e->getCode() == 23000) {
-                    $error = "Username hoặc Email đã tồn tại.";
+                    $error = "Username or email already exists.";
                 } else {
-                    $error = "Lỗi hệ thống: " . $e->getMessage();
+                    $error = "System error: " . $e->getMessage();
                 }
                 $stayOnRegister = true;
                 include '../app/views/auth/login.php';
@@ -111,7 +111,7 @@ class UserController
     public function changePassword()
     {
         if (!isset($_SESSION['user'])) {
-            echo "Bạn chưa đăng nhập.";
+            echo "You are not logged in.";
             return;
         }
 
@@ -120,7 +120,7 @@ class UserController
         $confirm = $_POST['confirm-password'] ?? '';
 
         if ($new !== $confirm) {
-            $_SESSION['error'] = "Xác nhận mật khẩu không khớp.";
+            $_SESSION['error'] = "Password confirmation does not match.";
             header("Location: index.php?route=profile#change-password");
             exit();
         }
@@ -130,7 +130,7 @@ class UserController
         $user = $model->getUserById($_SESSION['user']['id']);
 
         if (!$user || !password_verify($current, $user['password'])) {
-            $_SESSION['error'] = "Mật khẩu hiện tại không đúng.";
+            $_SESSION['error'] = "Current password is incorrect.";
             header("Location: index.php?route=profile#change-password");
             exit();
         }
@@ -139,9 +139,9 @@ class UserController
         $updated = $model->updatePassword($_SESSION['user']['id'], $hashedPassword);
 
         if ($updated) {
-            $_SESSION['success'] = "Thay đổi mật khẩu thành công.";
+            $_SESSION['success'] = "Password changed successfully.";
         } else {
-            $_SESSION['error'] = "Đã có lỗi xảy ra khi cập nhật.";
+            $_SESSION['error'] = "An error occurred while updating.";
         }
 
         header("Location: index.php?route=profile#change-password");
@@ -155,7 +155,7 @@ class UserController
         $email = $_POST['email'] ?? '';
 
         if (empty($username) || empty($email)) {
-            $_SESSION['error'] = "Vui lòng điền đầy đủ thông tin.";
+            $_SESSION['error'] = "Please fill in all the required information.";
             header("Location: index.php?route=forgot_password");
             exit;
         }
@@ -164,7 +164,7 @@ class UserController
         $user = $userModel->findByUsernameAndEmail($username, $email);
 
         if (!$user) {
-            $_SESSION['error'] = "Không tìm thấy người dùng với thông tin đã nhập.";
+            $_SESSION['error'] = "No user found with the provided information.";
             header("Location: index.php?route=forgot_password");
             exit;
         }
@@ -194,19 +194,19 @@ class UserController
             $mail->addAddress($email); // Địa chỉ người dùng nhập
 
             $mail->isHTML(true);
-            $mail->Subject = 'Mã xác nhận khôi phục mật khẩu';
-            $mail->Body = "Xin chào <b>$username</b>,<br><br>
-                   Đây là mã xác nhận để đặt lại mật khẩu:<br>
+            $mail->Subject = 'Password recovery verification code';
+            $mail->Body = "Hello <b>$username</b>,<br><br>
+                   Here is the verification code to reset your password:<br>
                    <h2>$code</h2>
-                   Nếu bạn không yêu cầu, vui lòng bỏ qua email này.<br><br>
-                   Trân trọng,<br>HealMate Team";
+                   If you did not request this, please ignore this email.<br><br>
+                   Sincerely,<br>HealMate Team";
 
             $mail->send();
-            $_SESSION['success'] = "Đã gửi mã xác nhận đến email của bạn.";
+            $_SESSION['success'] = "A verification code has been sent to your email.";
             header("Location: index.php?route=verify-reset-code");
             exit;
         } catch (Exception $e) {
-            $_SESSION['error'] = "Không thể gửi email. Lỗi: {$mail->ErrorInfo}";
+            $_SESSION['error'] = "Unable to send email. Error: {$mail->ErrorInfo}";
             header("Location: index.php?route=forgot_password");
             exit;
         }
@@ -218,7 +218,7 @@ class UserController
         if ($inputCode == $_SESSION['reset_code']) {
             header("Location: index.php?route=reset_password");
         } else {
-            $_SESSION['error'] = "Mã xác nhận không đúng.";
+            $_SESSION['error'] = "Invalid verification code.";
             header("Location: index.php?route=verify-reset-code");
         }
     }
@@ -231,7 +231,7 @@ class UserController
         $userId = $_SESSION['reset_user_id'] ?? null;
 
         if ($newPassword !== $confirm || !$userId) {
-            $_SESSION['error'] = "Mật khẩu không khớp.";
+            $_SESSION['error'] = "Incorrect username or password!";
             header("Location: index.php?route=reset_password");
             return;
         }
@@ -244,7 +244,7 @@ class UserController
         // Xóa session
         unset($_SESSION['reset_code'], $_SESSION['reset_user_id']);
 
-        $_SESSION['success'] = "Mật khẩu đã được cập nhật.";
+        $_SESSION['success'] = "Password has been updated.";
         header("Location: index.php?route=login");
     }
 
@@ -254,16 +254,16 @@ class UserController
         $userId = $_SESSION['reset_user_id'] ?? null;
 
         if (!$email || !$userId) {
-            $_SESSION['error'] = "Không thể gửi lại mã. Vui lòng thử lại từ đầu.";
+            $_SESSION['error'] = "Unable to resend the code. Please start over.";
             header("Location: index.php?route=forgot_password");
             exit;
         }
 
         $userModel = new DiseaseModel();
-        $user = $userModel->getUserById($userId); // Bạn cần thêm hàm này trong model nếu chưa có
+        $user = $userModel->getUserById($userId);
 
         if (!$user) {
-            $_SESSION['error'] = "Không tìm thấy người dùng.";
+            $_SESSION['error'] = "User not found.";
             header("Location: index.php?route=forgot_password");
             exit;
         }
@@ -289,16 +289,16 @@ class UserController
             $mail->setFrom('nkhai.contact@gmail.com', 'HealMate');
             $mail->addAddress($email);
             $mail->isHTML(true);
-            $mail->Subject = 'Mã xác nhận khôi phục mật khẩu';
-            $mail->Body = "Xin chào <b>{$user['username']}</b>,<br><br>
-                      Mã xác nhận mới của bạn là: <h2>$code</h2><br>
-                      Nếu không yêu cầu, vui lòng bỏ qua.<br><br>
-                      Trân trọng,<br>HealMate Team";
+            $mail->Subject = 'Password recovery verification code';
+            $mail->Body = "Hello <b>{$user['username']}</b>,<br><br>
+                      Your new verification code is: <h2>$code</h2><br>
+                      If you did not request this, please ignore this email.<br><br>
+                    Sincerely,<br>HealMate Team";
 
             $mail->send();
-            $_SESSION['success'] = "Mã xác nhận mới đã được gửi lại.";
+            $_SESSION['success'] = "A new verification code has been resent.";
         } catch (Exception $e) {
-            $_SESSION['error'] = "Không thể gửi lại mã. Lỗi: {$mail->ErrorInfo}";
+            $_SESSION['error'] = "Unable to resend the code. Error: {$mail->ErrorInfo}";
         }
 
         header("Location: index.php?route=verify-reset-code");

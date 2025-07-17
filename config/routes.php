@@ -1,16 +1,54 @@
 <?php
 $route = $_GET['route'] ?? 'login';
 $route = $_GET['route'] ?? 'home';
+$pdo = new PDO("mysql:host=localhost;dbname=medicine_system;charset=utf8", "root", "");
+$isPartial = isset($_GET['layout']) && $_GET['layout'] === 'partial';
 
 require_once '../app/controllers/UserController.php';
 require_once '../app/controllers/DiagnosisController.php';
+require_once '../app/controllers/AdminController.php';
 
 // Khởi tạo controller
 $userController = new UserController();
 $diseaseController = new DiseaseController();
+$adminController = new AdminController();
 
 switch ($route) {
-
+    // Admin
+    case 'admin-dashboard':
+        $adminController->dashboard($isPartial);
+        break;
+    case 'add-admin':
+        $adminController->addAdmin($isPartial);
+        break;
+    case 'admin-users':
+        $adminController->users($isPartial);
+        break;
+    case 'admin-diagnosis':
+        $adminController->diagnosis($isPartial);
+        break;
+    case 'admin-drugs':
+        $adminController->drugs($isPartial);
+        break;
+    case 'admin-diseases':
+        $adminController->diseases($isPartial);
+        break;
+    case 'admin-guides':
+        $adminController->guides($isPartial);
+        break;
+    case 'admin-settings':
+        $adminController->settings($isPartial);
+        break;
+    case 'admin-login':
+        $adminController->showLogin();
+        break;
+    case 'admin-login-handler':
+        $adminController->handleLogin();
+        break;
+    case 'admin-logout':
+        $adminController->logout();
+        break;
+    // Người dùng
     case 'home':
         include '../app/views/auth/home.php';
         break;

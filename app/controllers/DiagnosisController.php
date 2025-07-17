@@ -136,7 +136,7 @@ class DiseaseController
     public function historyDetail()
     {
         if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
-            echo "ID không hợp lệ.";
+            echo "Invalid ID.";
             return;
         }
 
@@ -144,14 +144,14 @@ class DiseaseController
         $userId = $_SESSION['user']['id'] ?? null;
 
         if (!$userId) {
-            echo "Không xác định người dùng.";
+            echo "User unknown.";
             return;
         }
 
         $history = $this->model->getUserHistoryById($historyId);
 
         if (!$history || $history['user_id'] != $userId) {
-            echo "Không tìm thấy lịch sử.";
+            echo "No history found.";
             return;
         }
 

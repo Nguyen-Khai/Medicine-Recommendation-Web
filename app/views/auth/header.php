@@ -51,7 +51,7 @@ $avatarSrc = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'asse
 
     .main-header {
         position: fixed;
-        top: 42px;
+        top: 40px;
         left: 0;
         width: 100%;
         background-color: #1e90ff;
@@ -273,7 +273,7 @@ $avatarSrc = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'asse
         z-index: 1;
         border-radius: 6px;
         padding: 8px 0;
-        top: 88px;
+        top: 87px;
     }
 
     .dropdown-menu a {
