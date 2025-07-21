@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HEALMATE - Admin Login</title>
+  <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather&display=swap" />
   <style>
     * {

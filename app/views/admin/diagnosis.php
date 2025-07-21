@@ -4,15 +4,13 @@ ob_start();
 ?>
 
 <div class="admin-diagnosis-container">
-    <h2 class="admin-diagnosis-title">Lịch sử chẩn đoán</h2>
-
     <form method="GET" action="" class="filter-form">
         <input type="hidden" name="route" value="admin-diagnosis">
 
-        <input type="text" name="keyword" placeholder="Tìm triệu chứng hoặc tên bệnh..." value="<?= htmlspecialchars($_GET['keyword'] ?? '') ?>">
+        <input type="text" name="keyword" placeholder="Search symptoms or disease name..." value="<?= htmlspecialchars($_GET['keyword'] ?? '') ?>">
 
         <select name="user_id">
-            <option value="">-- Tất cả người dùng --</option>
+            <option value="">-- All users --</option>
             <?php foreach ($allUsers as $user) : ?>
                 <option value="<?= $user['id'] ?>" <?= (($_GET['user_id'] ?? '') == $user['id']) ? 'selected' : '' ?>>
                     <?= htmlspecialchars($user['username']) ?>
@@ -21,14 +19,14 @@ ob_start();
         </select>
 
         <div class="date-range">
-            <label for="from_date">Từ ngày:</label>
+            <label for="from_date">From date:</label>
             <input type="date" id="from_date" name="from_date" value="<?= $_GET['from_date'] ?? '' ?>">
 
-            <label for="to_date">Đến ngày:</label>
+            <label for="to_date">To date:</label>
             <input type="date" id="to_date" name="to_date" value="<?= $_GET['to_date'] ?? '' ?>">
         </div>
 
-        <button type="submit">Lọc</button>
+        <button type="submit">Filter</button>
     </form>
 
     <div class="table-responsive">
@@ -36,11 +34,11 @@ ob_start();
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Người dùng</th>
-                    <th>Triệu chứng</th>
-                    <th>Tên bệnh</th>
-                    <th>Thời gian</th>
-                    <th>Chi tiết</th>
+                    <th>User</th>
+                    <th>Symptoms</th>
+                    <th>Disease Name</th>
+                    <th>Date & Time</th>
+                    <th>Details</th>
                 </tr>
             </thead>
             <tbody>
@@ -52,12 +50,12 @@ ob_start();
                             <td><?= htmlspecialchars($item['symptoms']) ?></td>
                             <td><?= htmlspecialchars($item['predicted_disease']) ?></td>
                             <td><?= date('d/m/Y H:i', strtotime($item['created_at'])) ?></td>
-                            <td><a href="?route=admin-diagnosis-detail&id=<?= $item['id'] ?>" class="view-link">Xem</a></td>
+                            <td><a href="?route=admin-diagnosis-detail&id=<?= $item['id'] ?>" class="view-link">View</a></td>
                         </tr>
                     <?php endforeach; ?>
                 <?php else : ?>
                     <tr>
-                        <td colspan="6" style="text-align:center;">Không có dữ liệu phù hợp.</td>
+                        <td colspan="6" style="text-align:center;">No matching data found.</td>
                     </tr>
                 <?php endif; ?>
             </tbody>

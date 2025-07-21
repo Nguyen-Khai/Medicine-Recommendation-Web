@@ -1,19 +1,32 @@
 <div class="admin-users-container">
-    <h2 class="admin-heading">Danh sách người dùng</h2>
+    <form method="get" action="index.php" class="admin-users-controls" style="display: flex; gap: 10px;">
+        <input type="hidden" name="route" value="admin-users">
 
-    <div class="admin-users-controls">
-        <input type="text" class="admin-search-input" placeholder="Tìm kiếm người dùng...">
-        <button class="admin-add-btn">+ Thêm người dùng</button>
-    </div>
+        <input
+            type="text"
+            class="admin-search-input"
+            name="keyword"
+            placeholder="Search by username or email..."
+            value="<?= htmlspecialchars($_GET['keyword'] ?? '') ?>">
+
+        <select name="status">
+            <option value="">All Status</option>
+            <option value="active" <?= (($_GET['status'] ?? '') === 'active') ? 'selected' : '' ?>>Active</option>
+            <option value="inactive" <?= (($_GET['status'] ?? '') === 'inactive') ? 'selected' : '' ?>>Inactive</option>
+        </select>
+
+        <button type="submit">Search</button>
+    </form>
 
     <table class="admin-users-table">
         <thead>
             <tr>
                 <th>#</th>
-                <th>Tên đăng nhập</th>
+                <th>Username</th>
                 <th>Email</th>
-                <th>Ngày tạo</th>
-                <th>Hành động</th>
+                <th>Registered Date</th>
+                <th>Status</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
@@ -24,14 +37,20 @@
                         <td><?= htmlspecialchars($user['username']) ?></td>
                         <td><?= htmlspecialchars($user['email']) ?></td>
                         <td><?= date('d/m/Y', strtotime($user['created_at'])) ?></td>
+                        <td><?= $user['is_active'] ? 'Active' : 'Inactive' ?></td>
                         <td>
-                            <button class="action-btn edit-btn">Sửa</button>
-                            <button class="action-btn delete-btn">Xóa</button>
+                            <?php if ($user['is_active']): ?>
+                                <a href="index.php?route=deactivate-user&id=<?= $user['id'] ?>" class="action-btn delete-btn">Deactivate</a>
+                            <?php else: ?>
+                                <a href="index.php?route=activate-user&id=<?= $user['id'] ?>" class="action-btn edit-btn">Activate</a>
+                            <?php endif; ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>
-                <tr><td colspan="5">Không có người dùng nào.</td></tr>
+                <tr>
+                    <td colspan="6">No users found.</td>
+                </tr>
             <?php endif; ?>
         </tbody>
     </table>

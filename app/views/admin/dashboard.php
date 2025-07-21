@@ -1,23 +1,24 @@
 <?php
 $title = "Dashboard";
-ob_start(); // bắt đầu ghi nội dung
+ob_start();
 ?>
+
 <div class="grid">
   <div class="card">
     <h3>Total Users</h3>
-    <div class="value">1,243</div>
+    <div class="value"><?= $totalUsers ?? 0 ?></div>
   </div>
   <div class="card">
     <h3>Diagnoses Today</h3>
-    <div class="value">78</div>
+    <div class="value"><?= $diagnosesToday ?? 0 ?></div>
   </div>
   <div class="card">
     <h3>Top Disease</h3>
-    <div class="value">Flu</div>
+    <div class="value"><?= htmlspecialchars($topDisease ?? 'N/A') ?></div>
   </div>
   <div class="card">
     <h3>Feedback Unread</h3>
-    <div class="value">5</div>
+    <div class="value"><?= $unreadFeedback ?? 0 ?></div>
   </div>
 </div>
 
@@ -26,13 +27,26 @@ ob_start(); // bắt đầu ghi nội dung
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
   const ctx = document.getElementById('diagnosisChart');
+
+  const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const dataFromPHP = <?= json_encode($diagnosesPerDay ?? []) ?>;
+  const today = new Date();
+  const monday = new Date(today.setDate(today.getDate() - today.getDay() + 1));
+
+  const chartData = labels.map((label, i) => {
+    const day = new Date(monday);
+    day.setDate(day.getDate() + i);
+    const dateStr = day.toISOString().slice(0, 10);
+    return dataFromPHP[dateStr] ?? 0;
+  });
+
   new Chart(ctx, {
     type: 'line',
     data: {
-      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      labels: labels,
       datasets: [{
         label: 'Diagnoses',
-        data: [12, 19, 7, 15, 10, 22, 18],
+        data: chartData,
         borderColor: '#1e3a8a',
         backgroundColor: 'rgba(30,58,138,0.1)',
         tension: 0.4,

@@ -7,22 +7,64 @@ $isPartial = isset($_GET['layout']) && $_GET['layout'] === 'partial';
 require_once '../app/controllers/UserController.php';
 require_once '../app/controllers/DiagnosisController.php';
 require_once '../app/controllers/AdminController.php';
+require_once '../config/database.php';
 
 // Khởi tạo controller
 $userController = new UserController();
 $diseaseController = new DiseaseController();
-$adminController = new AdminController();
+$adminController = new AdminController($pdo);
 
 switch ($route) {
     // Admin
     case 'admin-dashboard':
         $adminController->dashboard($isPartial);
         break;
+    case 'feedbacks':
+        $adminController->feedbacks();
+        break;
+    case 'mark-feedback':
+        $model = new AdminModel();
+        $model->markFeedbackRead($_GET['id']);
+        header("Location: index.php?route=feedbacks");
+        break;
+    case 'delete-feedback':
+        $model = new AdminModel();
+        $model->deleteFeedback($_GET['id']);
+        header("Location: index.php?route=feedbacks");
+        break;
+    case 'manage-permissions':
+        $adminController->managePermissions();
+        break;
+    case 'update-permissions':
+        $adminController->updatePermissions();
+        break;
     case 'add-admin':
         $adminController->addAdmin($isPartial);
         break;
+    case 'create-admin':
+        $adminController->createAdmin();
+        break;
+    case 'admins':
+        $adminController->showAdminList();
+        break;
+    case 'edit-admin':
+        $adminController->editAdmin($_GET['id']);
+        break;
+    case 'delete-admin':
+        $adminController->deleteAdmin($_GET['id']);
+        break;
     case 'admin-users':
         $adminController->users($isPartial);
+        break;
+    case 'deactivate-user':
+        $model = new AdminModel();
+        $model->updateStatus($_GET['id'], 0);
+        header('Location: index.php?route=admin-users');
+        break;
+    case 'activate-user':
+        $model = new AdminModel();
+        $model->updateStatus($_GET['id'], 1);
+        header('Location: index.php?route=admin-users');
         break;
     case 'admin-diagnosis':
         $adminController->diagnosis($isPartial);
@@ -33,11 +75,13 @@ switch ($route) {
     case 'admin-diseases':
         $adminController->diseases($isPartial);
         break;
-    case 'admin-guides':
-        $adminController->guides($isPartial);
-        break;
     case 'admin-settings':
-        $adminController->settings($isPartial);
+        include '../app/views/admin/settings.php';
+        break;
+    case 'admin-update-password':
+        require_once '../app/controllers/AdminController.php';
+        $settingsController = new AdminController($pdo);
+        $settingsController->updatePassword();
         break;
     case 'admin-login':
         $adminController->showLogin();
