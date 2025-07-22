@@ -728,24 +728,113 @@
             color: #777;
         }
 
-        .add-drug-btn {
-            display: inline-block;
-            background-color: #28a745;
-            /* Màu xanh lá */
-            color: white;
-            padding: 10px 18px;
-            border: none;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: bold;
-            cursor: pointer;
-            margin: 15px 0;
-            text-decoration: none;
-            transition: background-color 0.2s ease;
+        /* Container chính */
+        .add-drug-form {
+            background-color: #ffffff;
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            font-family: 'Segoe UI', sans-serif;
+            color: #333;
         }
 
-        .add-drug-btn:hover {
-            background-color: #218838;
+        /* Tiêu đề */
+        .add-drug-form h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        /* Label */
+        .add-drug-form label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 6px;
+            color: #34495e;
+        }
+
+        /* Input chung */
+        .add-drug-input,
+        .add-drug-url {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .add-drug-input:focus,
+        .add-drug-url:focus {
+            border-color: #007BFF;
+            outline: none;
+        }
+
+        /* Nhóm hoạt chất */
+        .ingredient-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .ingredient-name,
+        .ingredient-amount {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        /* Nút */
+        .submit-drug-btn {
+            background: #28a745;
+            color: white;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .submit-drug-btn:hover {
+            background: #218838;
+        }
+
+        .add-ingredient-btn {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .add-ingredient-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* Thông báo lỗi hoặc thành công */
+        .form-message {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .form-message.error {
+            color: red;
+        }
+
+        .form-message.success {
+            color: green;
         }
 
         /* Diseases*/
@@ -842,6 +931,7 @@
             <li class="has-submenu">
                 <a href="javascript:void(0)" onclick="toggleSubmenu(this)">
                     <i class="fas fa-users-cog"></i> Admin Management
+                    <i class="fas fa-chevron-down arrow"></i>
                 </a>
                 <ul class="submenu">
                     <li><a href="index.php?route=add-admin"><i class="fas fa-user-plus"></i> Add Admin</a></li>
@@ -851,8 +941,28 @@
 
             <li><a href="index.php?route=admin-users"><i class="fas fa-users"></i> Users</a></li>
             <li><a href="index.php?route=admin-diagnosis"><i class="fas fa-stethoscope"></i> Diagnosis</a></li>
-            <li><a href="index.php?route=admin-drugs"><i class="fas fa-pills"></i> Drugs</a></li>
-            <li><a href="index.php?route=admin-diseases"><i class="fas fa-virus"></i> Diseases</a></li>
+
+            <li class="has-submenu">
+                <a href="javascript:void(0)" onclick="toggleSubmenu(this)">
+                    <i class="fas fa-pills"></i> Drugs
+                    <i class="fas fa-chevron-down arrow"></i>
+                </a>
+                <ul class="submenu">
+                    <li><a href="index.php?route=admin-add-drug"><i class="fas fa-plus-circle"></i> Add New Drug</a></li>
+                    <li><a href="index.php?route=admin-drugs"><i class="fas fa-capsules"></i> Drug List</a></li>
+                </ul>
+            </li>
+
+            <li class="has-submenu">
+                <a href="javascript:void(0)" onclick="toggleSubmenu(this)">
+                    <i class="fas fa-virus"></i> Diseases
+                    <i class="fas fa-chevron-down arrow"></i>
+                </a>
+                <ul class="submenu">
+                    <li><a href="index.php?route=admin-add-disease"><i class="fas fa-plus-square"></i> Add New Disease</a></li>
+                    <li><a href="index.php?route=admin-diseases"><i class="fas fa-list-ul"></i> Disease List</a></li>
+                </ul>
+            </li>
             <li><a href="index.php?route=feedbacks"><i class="fas fa-comment-dots"></i> Feedbacks</a></li>
             <li><a href="index.php?route=admin-settings"><i class="fas fa-cog"></i> Settings</a></li>
 
@@ -879,6 +989,22 @@
             <?= isset($content) ? $content : '<p>No content loaded.</p>' ?>
         </div>
     </main>
+
+    <style>
+        .sidebar .arrow {
+            float: right;
+            transition: transform 0.3s ease;
+            font-weight: bold;
+            margin: -1px;
+            position: relative;
+            left: 5px;
+            top: 3px;
+        }
+
+        .sidebar .open>a .arrow {
+            transform: rotate(180deg);
+        }
+    </style>
 
     <script>
         function loadContent(route) {
@@ -917,6 +1043,14 @@
                     window.location.href = "index.php?route=admin-logout";
                 }
             });
+        }
+
+        function toggleSubmenu(element) {
+            const parent = element.parentElement;
+            parent.classList.toggle('open');
+
+            const submenu = parent.querySelector('.submenu');
+            submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
         }
     </script>
 </body>

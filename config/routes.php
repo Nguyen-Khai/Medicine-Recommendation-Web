@@ -16,81 +16,150 @@ $adminController = new AdminController($pdo);
 
 switch ($route) {
     // Admin
+    /** ========== AUTH ========== **/
+    case 'admin-login':
+        $adminController->showLogin();
+        break;
+
+    case 'admin-login-handler':
+        $adminController->handleLogin();
+        break;
+
+    case 'admin-logout':
+        $adminController->logout();
+        break;
+
+    /** ========== DASHBOARD & SETTINGS ========== **/
     case 'admin-dashboard':
         $adminController->dashboard($isPartial);
         break;
-    case 'feedbacks':
-        $adminController->feedbacks();
-        break;
-    case 'mark-feedback':
-        $model = new AdminModel();
-        $model->markFeedbackRead($_GET['id']);
-        header("Location: index.php?route=feedbacks");
-        break;
-    case 'delete-feedback':
-        $model = new AdminModel();
-        $model->deleteFeedback($_GET['id']);
-        header("Location: index.php?route=feedbacks");
-        break;
-    case 'manage-permissions':
-        $adminController->managePermissions();
-        break;
-    case 'update-permissions':
-        $adminController->updatePermissions();
-        break;
-    case 'add-admin':
-        $adminController->addAdmin($isPartial);
-        break;
-    case 'create-admin':
-        $adminController->createAdmin();
-        break;
-    case 'admins':
-        $adminController->showAdminList();
-        break;
-    case 'edit-admin':
-        $adminController->editAdmin($_GET['id']);
-        break;
-    case 'delete-admin':
-        $adminController->deleteAdmin($_GET['id']);
-        break;
-    case 'admin-users':
-        $adminController->users($isPartial);
-        break;
-    case 'deactivate-user':
-        $model = new AdminModel();
-        $model->updateStatus($_GET['id'], 0);
-        header('Location: index.php?route=admin-users');
-        break;
-    case 'activate-user':
-        $model = new AdminModel();
-        $model->updateStatus($_GET['id'], 1);
-        header('Location: index.php?route=admin-users');
-        break;
-    case 'admin-diagnosis':
-        $adminController->diagnosis($isPartial);
-        break;
-    case 'admin-drugs':
-        $adminController->drugs($isPartial);
-        break;
-    case 'admin-diseases':
-        $adminController->diseases($isPartial);
-        break;
+
     case 'admin-settings':
         include '../app/views/admin/settings.php';
         break;
+
     case 'admin-update-password':
         require_once '../app/controllers/AdminController.php';
         $settingsController = new AdminController($pdo);
         $settingsController->updatePassword();
         break;
-    case 'admin-login':
-        $adminController->showLogin();
+
+    /** ========== ADMIN MANAGEMENT ========== **/
+    case 'admins':
+        $adminController->showAdminList();
         break;
-    case 'admin-login-handler':
-        $adminController->handleLogin();
+
+    case 'add-admin':
+        $adminController->addAdmin($isPartial);
         break;
-    case 'admin-logout':
-        $adminController->logout();
+
+    case 'create-admin':
+        $adminController->createAdmin();
+        break;
+
+    case 'edit-admin':
+        $adminController->editAdmin($_GET['id']);
+        break;
+
+    case 'delete-admin':
+        $adminController->deleteAdmin($_GET['id']);
+        break;
+
+    case 'manage-permissions':
+        $adminController->managePermissions();
+        break;
+
+    case 'update-permissions':
+        $adminController->updatePermissions();
+        break;
+
+    /** ========== USER MANAGEMENT ========== **/
+    case 'admin-users':
+        $adminController->users($isPartial);
+        break;
+
+    case 'deactivate-user':
+        $model = new AdminModel();
+        $model->updateStatus($_GET['id'], 0);
+        header('Location: index.php?route=admin-users');
+        break;
+
+    case 'activate-user':
+        $model = new AdminModel();
+        $model->updateStatus($_GET['id'], 1);
+        header('Location: index.php?route=admin-users');
+        break;
+
+    /** ========== DIAGNOSIS HISTORY ========== **/
+    case 'admin-diagnosis':
+        $adminController->diagnosis($isPartial);
+        break;
+
+    /** ========== DRUG MANAGEMENT ========== **/
+    case 'admin-drugs':
+        $adminController->drugs($isPartial);
+        break;
+
+    case 'admin-add-drug':
+        $adminController->showAddDrugForm();
+        break;
+
+    case 'admin-store-drug':
+        $adminController->storeDrug();
+        break;
+
+    case 'admin-edit-drug':
+        $adminController->showEditDrugForm($_GET['id'], $isPartial);
+        break;
+
+    case 'admin-update-drug':
+        $adminController->updateDrug();
+        break;
+
+    case 'admin-delete-drug':
+        $adminController->deleteDrug($_GET['id'] ?? null);
+        break;
+
+    /** ========== DISEASE MANAGEMENT ========== **/
+    case 'admin-diseases':
+        $adminController->diseases($isPartial);
+        break;
+
+    case 'admin-add-disease':
+        $adminController->showAddDiseaseForm($isPartial);
+        break;
+
+    case 'add-disease':
+        $adminController->addDisease();
+        break;
+
+    case 'admin-edit-disease':
+        $adminController->showEditDiseaseForm($_GET['id'], $isPartial);
+        break;
+
+    case 'admin-update-disease':
+        $adminController->updateDisease();
+        break;
+
+    case 'admin-delete-disease':
+        $adminController->deleteDisease($_GET['id'] ?? null);
+        break;
+
+    /** ========== FEEDBACK ========== **/
+    case 'feedbacks':
+        $adminController->feedbacks();
+        break;
+
+    case 'mark-feedback':
+        $model = new AdminModel();
+        $model->markFeedbackRead($_GET['id']);
+        header("Location: index.php?route=feedbacks");
+        break;
+
+    case 'delete-feedback':
+        $model = new AdminModel();
+        $model->deleteFeedback($_GET['id']);
+        header("Location: index.php?route=feedbacks");
         break;
     // Người dùng
     case 'home':

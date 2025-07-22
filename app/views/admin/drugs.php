@@ -17,12 +17,6 @@ $admin = $_SESSION['admin'] ?? null;
         <button type="submit">Search</button>
     </form>
 
-    <?php if ($admin && in_array($admin['role'], ['superadmin', 'manager'])): ?>
-        <div style="text-align: right; margin: 10px 0;">
-            <a href="index.php?route=admin-add-drug" class="add-drug-btn">+ Add New Drug</a>
-        </div>
-    <?php endif; ?>
-
     <div class="table-responsive">
         <table class="admin-table">
             <thead>
@@ -60,16 +54,24 @@ $admin = $_SESSION['admin'] ?? null;
                             <td><a href="<?= htmlspecialchars($drug['url']) ?>" target="_blank" class="view-link">View</a></td>
                             <td>
                                 <?php if ($admin && in_array($admin['role'], ['superadmin', 'manager'])): ?>
-                                    <a href="index.php?route=admin-edit-drug&id=<?= $drug['id'] ?>" class="edit-btn">Edit</a>
+                                    <a href="index.php?route=admin-edit-drug&id=<?= $drug['id'] ?>" class="btn btn-edit">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
                                 <?php endif; ?>
+
                                 <?php if ($admin && $admin['role'] === 'superadmin'): ?>
-                                    <a href="index.php?route=admin-delete-drug&id=<?= $drug['id'] ?>" class="delete-btn" onclick="return confirm('Are you sure you want to delete this drug?')">Delete</a>
+                                    <a href="javascript:void(0);" class="btn btn-delete"
+                                        onclick="confirmDelete(<?= $drug['id'] ?>, '<?= htmlspecialchars($drug['ten_thuoc'], ENT_QUOTES) ?>')">
+                                        <i class="fas fa-trash-alt"></i> Delete
+                                    </a>
                                 <?php endif; ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <tr><td colspan="9" style="text-align: center;">No matching results found.</td></tr>
+                    <tr>
+                        <td colspan="9" style="text-align: center;">No matching results found.</td>
+                    </tr>
                 <?php endif; ?>
             </tbody>
         </table>
@@ -107,3 +109,59 @@ $admin = $_SESSION['admin'] ?? null;
         </div>
     <?php endif; ?>
 </div>
+<style>
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 12px;
+        font-size: 14px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-edit {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background-color: #218838;
+    }
+
+    .btn-delete {
+        background-color: #dc3545;
+        color: white;
+        margin-top: 10px;
+    }
+
+    .btn-delete:hover {
+        background-color: #c82333;
+    }
+</style>
+<script>
+    function confirmDelete(drugId, drugName) {
+        Swal.fire({
+            title: 'Are you sure?',
+            html: `You are about to delete <b style="color:#d33;">${drugName}</b>. This action cannot be undone.`,
+            imageUrl: 'assets/images/question_mask.png',
+            imageWidth: 100,
+            imageHeight: 100,
+            imageAlt: 'Warning Image',
+            showCancelButton: true,
+            confirmButtonText: 'Delete',
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = `index.php?route=admin-delete-drug&id=${drugId}`;
+            }
+        });
+    }
+</script>

@@ -36,7 +36,7 @@ class AdminController
                 header("Location: index.php?route=admin-dashboard");
                 exit();
             } else {
-                $_SESSION['admin_error'] = "Sai tài khoản hoặc mật khẩu.";
+                $_SESSION['admin_error'] = "The username or password you entered is incorrect.";
                 header("Location: index.php?route=admin-login");
                 exit();
             }
@@ -121,7 +121,7 @@ class AdminController
     public function updatePermissions()
     {
         if (!isset($_SESSION['admin']) || $_SESSION['admin']['role'] !== 'superadmin') {
-            $_SESSION['error_message'] = "Bạn không có quyền truy cập trang này.";
+            $_SESSION['error_message'] = "You do not have permission to access this page.";
             header("Location: index.php?route=manage-permissions");
             exit;
         }
@@ -152,7 +152,7 @@ class AdminController
     {
         // Kiểm tra quyền superadmin
         if (!isset($_SESSION['admin']) || $_SESSION['admin']['role'] !== 'superadmin') {
-            $_SESSION['error_message'] = "Bạn không có quyền truy cập trang này.";
+            $_SESSION['error_message'] = "You do not have permission to access this page.";
             header("Location: index.php?route=admin-dashboard");
             exit;
         }
@@ -183,7 +183,7 @@ class AdminController
         if ($username && $email && $password) {
             // Kiểm tra username đã tồn tại chưa
             if ($model->findByUsername($username)) {
-                $_SESSION['admin_message'] = "Tên đăng nhập đã tồn tại. Vui lòng chọn tên khác.";
+                $_SESSION['admin_message'] = "Username already exists. Please choose a different one.";
                 $_SESSION['admin_message_type'] = "error";
                 header("Location: index.php?route=add-admin");
                 exit;
@@ -196,18 +196,18 @@ class AdminController
                 $model->logAction($_SESSION['admin']['id'], 'Created a new admin: ' . $username);
 
                 if ($result) {
-                    $_SESSION['admin_message'] = "Tạo tài khoản admin thành công!";
+                    $_SESSION['admin_message'] = "Admin account created successfully!";
                     $_SESSION['admin_message_type'] = "success";
                 } else {
-                    $_SESSION['admin_message'] = "Không thể tạo tài khoản. Có thể do trùng tên đăng nhập hoặc lỗi hệ thống.";
+                    $_SESSION['admin_message'] = "Account creation failed. The username may already exist or there was a system error.";
                     $_SESSION['admin_message_type'] = "error";
                 }
             } catch (PDOException $e) {
-                $_SESSION['admin_message'] = "Lỗi: " . $e->getMessage();
+                $_SESSION['admin_message'] = "Error: " . $e->getMessage();
                 $_SESSION['admin_message_type'] = "error";
             }
         } else {
-            $_SESSION['admin_message'] = "Vui lòng điền đầy đủ thông tin.";
+            $_SESSION['admin_message'] = "Please fill in all required information.";
             $_SESSION['admin_message_type'] = "error";
         }
 
@@ -216,20 +216,27 @@ class AdminController
     }
 
     // Thông tin các admin
-    public function showAdminList()
+    public function showAdminList($isPartial = false)
     {
         require_once '../app/models/AdminModel.php';
         $adminModel = new AdminModel();
-        $admins = $adminModel->getAllAdmins();
 
-        // Lấy admin hiện tại từ session
-        $currentAdmin = $_SESSION['admin'] ?? null;
+        $search = $_GET['search'] ?? '';
+        $role = $_GET['role'] ?? '';
 
-        $title = "Admin List";
+        $admins = $adminModel->searchAndFilter($search, $role);
+
+        $title = "Admin Management";
+
         ob_start();
         require '../app/views/admin/admin_list.php';
         $content = ob_get_clean();
-        require '../app/views/admin/home.php';
+
+        if ($isPartial) {
+            echo $content;
+        } else {
+            require '../app/views/admin/home.php';
+        }
     }
 
     // Hiển thị form sửa admin
@@ -261,7 +268,7 @@ class AdminController
             exit;
         }
 
-        $title = "Sửa thông tin Admin";
+        $title = "Edit Admin Details";
         ob_start();
         require '../app/views/admin/edit_admin.php';
         $content = ob_get_clean();
@@ -291,7 +298,7 @@ class AdminController
         $model = new AdminModel();
         $feedbacks = $model->getAllFeedbacks();
 
-        $title = "Phản hồi người dùng";
+        $title = "User Feedback";
         ob_start();
         require '../app/views/admin/feedbacks.php';
         $content = ob_get_clean();
@@ -379,76 +386,143 @@ class AdminController
     }
 
     //Thêm sửa xóa thuốc
-    // Trong AdminController.php
-    public function deleteDrug()
+    public function showEditDrugForm($id, $isPartial)
     {
-        session_start();
-        if ($_SESSION['admin']['role'] !== 'superadmin') {
-            header('Location: index.php?route=admin-drugs&error=unauthorized');
-            exit;
+        $drug = $this->model->getDrugById($id);
+        $ingredients = $this->model->getActiveIngredientsByDrugId($id);
+
+        if (!$drug) {
+            echo "Drug not found.";
+            return;
         }
 
-        $id = $_GET['id'] ?? null;
-        if ($id) {
-            require_once '../app/models/AdminModel.php';
-            $model = new AdminModel();
-            $model->deleteDrugById($id);
-        }
+        $title = "Edit Drug";
+        ob_start();
+        require '../app/views/admin/edit_drug.php';
+        $content = ob_get_clean();
 
-        header('Location: index.php?route=admin-drugs');
-        exit;
+        if ($isPartial) {
+            echo $content;
+        } else {
+            require '../app/views/admin/home.php';
+        }
     }
 
-    public function editDrug()
+    public function updateDrug()
     {
-        session_start();
-        if (!in_array($_SESSION['admin']['role'], ['superadmin', 'manager'])) {
-            header('Location: index.php?route=admin-drugs&error=unauthorized');
+        $id = $_POST['id'];
+        $tenThuoc = $_POST['ten_thuoc'];
+        $dangBaoChe = $_POST['dang_bao_che'];
+        $soDangKy = $_POST['so_dang_ky'];
+        $quyCach = $_POST['quy_cach'];
+        $hanSuDung = $_POST['han_su_dung'];
+        $url = $_POST['url'];
+        $activeIngredients = $_POST['active_ingredients'];
+        $concentrations = $_POST['concentrations'];
+
+        $this->model->updateDrug($id, $tenThuoc, $dangBaoChe, $soDangKy, $quyCach, $hanSuDung, $url, $activeIngredients, $concentrations);
+
+        header("Location: index.php?route=admin-drugs");
+    }
+
+    public function deleteDrug($id)
+    {
+        // Kiểm tra phân quyền: chỉ superadmin mới được xóa
+        if (!isset($_SESSION['admin']) || $_SESSION['admin']['role'] !== 'superadmin') {
+            header('Location: index.php?route=admin-login');
             exit;
         }
 
-        $id = $_GET['id'] ?? null;
-        require_once '../app/models/AdminModel.php';
-        $model = new AdminModel();
+        if (!$id || !is_numeric($id)) {
+            echo "Invalid drug ID.";
+            return;
+        }
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $data = $_POST;
-            $model->updateDrug($id, $data);
+        $success = $this->model->deleteDrugById($id);
+
+        if ($success) {
+            header('Location: index.php?route=admin-drugs&status=deleted');
+        } else {
+            echo "Failed to delete drug.";
+        }
+    }
+
+    // Thêm thuốc
+    // Hiển thị form thêm thuốc
+    public function showAddDrugForm($isPartial = false)
+    {
+        // Tải view
+        $title = "Add Drug From";
+        ob_start();
+        require '../app/views/admin/add_drug.php';
+        $content = ob_get_clean();
+
+        if ($isPartial) {
+            echo $content;
+        } else {
+            require '../app/views/admin/home.php';
+        }
+    }
+
+    // Xử lý lưu thuốc
+    public function storeDrug()
+    {
+        // Kiểm tra quyền
+        if (!isset($_SESSION['admin']) || !in_array($_SESSION['admin']['role'], ['superadmin', 'manager'])) {
+            $_SESSION['error'] = 'You do not have permission to access this page.';
             header('Location: index.php?route=admin-drugs');
             exit;
         }
 
-        $drug = $model->getDrugById($id);
-        $ingredients = $model->getIngredientsByDrugId($id); // Load thành phần
+        // Lấy dữ liệu từ form
+        $ten_thuoc = $_POST['ten_thuoc'] ?? '';
+        $dang_bao_che = $_POST['dang_bao_che'] ?? '';
+        $so_dang_ky = $_POST['so_dang_ky'] ?? '';
+        $quy_cach = $_POST['quy_cach'] ?? '';
+        $han_su_dung = $_POST['han_su_dung'] ?? '';
+        $url = $_POST['url'] ?? '';
+        $hoat_chat = $_POST['hoat_chat'] ?? [];
 
-        require '../app/views/admin/edit_drug.php';
-    }
-
-    //Xử lí cập nhật thuốc
-    public function updateDrug()
-    {
-        $id = $_GET['id'] ?? null;
-        if (!$id) {
-            die("Thiếu ID thuốc");
-        }
-
-        $data = [
-            'ten_thuoc' => $_POST['ten_thuoc'],
-            'dang_bao_che' => $_POST['dang_bao_che'],
-            'so_dang_ky' => $_POST['so_dang_ky'],
-            'quy_cach' => $_POST['quy_cach'],
-            'han_su_dung' => $_POST['han_su_dung'],
-            'url' => $_POST['url'],
-            'hoat_chat' => $_POST['hoat_chat'] ?? []
-        ];
-
-        $model = new AdminModel();
-        if ($model->updateDrug($id, $data)) {
-            header("Location: index.php?route=admin-drugs&msg=success");
+        // Kiểm tra tên thuốc bắt buộc
+        if (trim($ten_thuoc) === '') {
+            $_SESSION['error'] = 'The drug name is required.';
+            header('Location: index.php?route=admin-add-drug');
             exit;
-        } else {
-            echo "Cập nhật thất bại.";
         }
+
+        // Gọi model
+        require_once '../app/models/AdminModel.php';
+        $drugModel = new AdminModel();
+
+        // Thêm vào bảng drugs
+        $drugId = $drugModel->insertDrug([
+            'ten_thuoc' => $ten_thuoc,
+            'dang_bao_che' => $dang_bao_che,
+            'so_dang_ky' => $so_dang_ky,
+            'quy_cach' => $quy_cach,
+            'han_su_dung' => $han_su_dung,
+            'url' => $url
+        ]);
+
+        // Nếu thêm thành công, thêm hoạt chất
+        if ($drugId && !empty($hoat_chat)) {
+            foreach ($hoat_chat as $item) {
+                $ten = trim($item['ten'] ?? '');
+                $ham_luong = trim($item['ham_luong'] ?? '');
+
+                if ($ten !== '') {
+                    $drugModel->insertActiveIngredient([
+                        'ten_hoat_chat' => $ten,
+                        'ham_luong' => $ham_luong,
+                        'drug_id' => $drugId
+                    ]);
+                }
+            }
+        }
+
+        $_SESSION['success'] = 'The drug has been added successfully.';
+        header('Location: index.php?route=admin-drugs');
+        exit;
     }
 
     private $model;
@@ -474,6 +548,103 @@ class AdminController
 
         // Đưa dữ liệu ra view
         include '../app/views/admin/diseases.php';
+    }
+
+    public function showAddDiseaseForm($isPartial)
+    {
+        // Tải view
+        $title = "Add New Disease";
+        ob_start();
+        require '../app/views/admin/add_disease.php';
+        $content = ob_get_clean();
+
+        if ($isPartial) {
+            echo $content;
+        } else {
+            require '../app/views/admin/home.php';
+        }
+    }
+
+    public function addDisease()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $name = $_POST['name'] ?? '';
+            $description = $_POST['description'] ?? '';
+            $symptoms = explode("\n", $_POST['symptoms'] ?? '');
+            $precautions = explode("\n", $_POST['precautions'] ?? '');
+            $medications = explode("\n", $_POST['medications'] ?? '');
+            $diets = explode("\n", $_POST['diets'] ?? '');
+            $workouts = explode("\n", $_POST['workouts'] ?? '');
+
+            // Bắt đầu thêm vào CSDL
+            require_once '../app/models/AdminModel.php';
+            $model = new AdminModel();
+
+            // 1. Thêm bệnh
+            $diseaseId = $model->addDisease($name, $description);
+
+            // 2. Thêm các liên kết
+            $model->addDiseaseSymptoms($diseaseId, $symptoms);
+            $model->addPrecautions($diseaseId, $precautions);
+            $model->addMedications($diseaseId, $medications);
+            $model->addDiets($diseaseId, $diets);
+            $model->addWorkouts($diseaseId, $workouts);
+
+            // Redirect hoặc hiển thị thông báo
+            header('Location: index.php?route=admin-diseases&success=1');
+            exit;
+        } else {
+            require_once '../app/views/admin/add_disease.php';
+        }
+    }
+
+    //Sửa, xóa disease
+    public function showEditDiseaseForm($id, $isPartial = false)
+    {
+        $disease = $this->model->getDiseaseById($id);
+        $symptoms = $this->model->getSymptomsByDisease($id);
+        $medications = $this->model->getMedicationsByDisease($id);
+        $diets = $this->model->getDietsByDisease($id);
+        $precautions = $this->model->getPrecautionsByDisease($id);
+        $workouts = $this->model->getWorkoutsByDisease($id);
+
+        $title = "Edit Disease";
+        ob_start();
+        require '../app/views/admin/edit_disease.php';
+        $content = ob_get_clean();
+
+        if ($isPartial) {
+            echo $content;
+        } else {
+            require '../app/views/admin/home.php';
+        }
+    }
+
+    public function updateDisease()
+    {
+        $id = $_POST['id'];
+        $data = [
+            'disease' => $_POST['disease'],
+            'description' => $_POST['description'],
+            'diets' => $_POST['diets'] ?? [],
+            'medications' => $_POST['medications'] ?? [],
+            'precautions' => $_POST['precautions'] ?? [],
+            'workouts' => $_POST['workouts'] ?? [],
+            'symptoms' => $_POST['symptoms'] ?? []
+        ];
+
+        $this->model->updateDisease($id, $data);
+
+        header('Location: index.php?route=admin-diseases');
+    }
+
+    public function deleteDisease($id)
+    {
+        if ($_SESSION['admin']['role'] !== 'superadmin') {
+            die("Unauthorized");
+        }
+        $this->model->deleteDisease($id);
+        header('Location: index.php?route=admin-diseases');
     }
 
     // Settings
