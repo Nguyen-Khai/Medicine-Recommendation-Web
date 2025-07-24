@@ -1,3 +1,15 @@
+<?php
+if (!isset($_SESSION['admin'])) {
+    header("Location: index.php?route=login");
+    exit();
+}
+
+require_once '../app/models/AdminModel.php';
+$adminModel = new AdminModel();
+$adminInfo = $adminModel->getAdminById($_SESSION['admin']['id']); // lấy avatar từ DB
+$avatar = $adminInfo['avatar'] ?? null;
+$avatarSrc = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'assets/images/default-avatar.png';
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -309,7 +321,7 @@
             width: 100%;
             padding: 12px;
             font-size: 16px;
-            background-color: #1e3a8a;
+            background-color: #007BFF;
             color: white;
             border: none;
             border-radius: 8px;
@@ -318,7 +330,7 @@
         }
 
         .admin-submit-btn:hover {
-            background-color: #0f265c;
+            background-color: #0056b3;
         }
 
         .alert {
@@ -791,7 +803,7 @@
 
         /* Nút */
         .submit-drug-btn {
-            background: #28a745;
+            background: #007BFF;
             color: white;
             padding: 10px 16px;
             border: none;
@@ -800,14 +812,15 @@
             cursor: pointer;
             transition: background-color 0.3s ease;
             margin-top: 10px;
+            width: 100%;
         }
 
         .submit-drug-btn:hover {
-            background: #218838;
+            background: #0056b3;
         }
 
         .add-ingredient-btn {
-            background-color: #007BFF;
+            background-color: #28a745;
             color: white;
             padding: 10px 16px;
             border: none;
@@ -819,7 +832,7 @@
         }
 
         .add-ingredient-btn:hover {
-            background-color: #0056b3;
+            background-color: #218838;
         }
 
         /* Thông báo lỗi hoặc thành công */
@@ -964,17 +977,28 @@
                 </ul>
             </li>
             <li><a href="index.php?route=feedbacks"><i class="fas fa-comment-dots"></i> Feedbacks</a></li>
-            <li><a href="index.php?route=admin-settings"><i class="fas fa-cog"></i> Settings</a></li>
-
         </ul>
     </aside>
 
     <main>
         <div class="header" style="display: flex; justify-content: space-between; align-items: center; padding: 16px;">
             <h1><?= $title ?? 'Admin' ?></h1>
-            <button onclick="logout()" style="background:#dc2626;color:white;padding:8px 16px;border:none;border-radius:6px;cursor:pointer">
-                Logout
-            </button>
+
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <a href="index.php?route=admin-settings"
+                    style="display: flex; align-items: center; gap: 10px; background: #eff6ff; padding: 6px 12px; border-radius: 8px; text-decoration: none;">
+                    <img src="<?= $avatarSrc ?>"
+                        alt="Admin Avatar"
+                        style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; cursor: pointer;">
+                    <span style="font-weight: 500; color: #1e3a8a;">
+                        Hello, <?= htmlspecialchars($adminInfo['name']) ?>
+                    </span>
+                </a>
+
+                <button onclick="logout()" style="background:#dc2626;color:white;padding:8px 16px;border:none;border-radius:6px;cursor:pointer">
+                    Logout
+                </button>
+            </div>
         </div>
 
         <!-- Nội dung -->

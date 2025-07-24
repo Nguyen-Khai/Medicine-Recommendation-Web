@@ -457,6 +457,32 @@ $base64 = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'default
             box-shadow: 0 0 5px rgba(30, 144, 255, 0.5);
         }
 
+        .search-form {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        #search-filter {
+            padding: 8px;
+            flex: 1;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        .search-form button {
+            padding: 8px 16px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .search-form button:hover {
+            background-color: #218838;
+        }
+
         /*icon*/
         .nav-item {
             display: flex;
@@ -467,6 +493,18 @@ $base64 = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'default
             width: 20px;
             height: 20px;
             margin-bottom: 2px;
+        }
+
+        /* Feedbacks */
+        .feedback-link {
+            margin: 0 10px;
+            color: #007bff;
+            text-decoration: underline;
+            font-weight: 500;
+        }
+
+        .feedback-link:hover {
+            color: #0056b3;
         }
     </style>
 </head>
@@ -602,11 +640,11 @@ $base64 = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'default
             <section id="advice-history">
                 <h2>Recommendation history</h2>
                 <div class="input-with-icon">
-                    <input type="text" id="search-filter" placeholder="Tìm kiếm trong lịch sử tư vấn...">
-                    <svg class="icon-search" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1110.5 3a7.5 7.5 0 016.15 13.65z" />
-                    </svg>
+                    <form method="GET" action="index.php?route=profile#advice-history" class="search-form">
+                        <input type="hidden" name="route" value="profile">
+                        <input type="text" name="search" placeholder="Tìm kiếm trong lịch sử tư vấn..." value="<?= htmlspecialchars($_GET['search'] ?? '') ?>">
+                        <button type="submit">🔍 Tìm</button>
+                    </form>
                 </div>
                 <?php if (!empty($userHistories)): ?>
                     <ul>
@@ -614,6 +652,13 @@ $base64 = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'default
                             <li>
                                 <?= htmlspecialchars($record['predicted_disease']) ?> –
                                 recommend at <?= date('H:i d/m/Y', strtotime($record['created_at'])) ?>
+
+                                <?php if (!empty($record['has_feedback'])): ?>
+                                    <a href="index.php?route=view-feedback&id=<?= $record['id'] ?>" class="view-feedback-link" style="text-decoration: none;">View Feedback</a>
+                                <?php else: ?>
+                                    <a href="index.php?route=feedback&id=<?= $record['id'] ?>&disease=<?= urlencode($record['predicted_disease']) ?>&time=<?= urlencode($record['created_at']) ?>" class="feedback-link" style="text-decoration: none;">Feedback</a>
+                                <?php endif; ?>
+
                                 <a href="index.php?route=history-detail&id=<?= $record['id'] ?>" class="detail-link">Details</a>
                             </li>
                         <?php endforeach; ?>

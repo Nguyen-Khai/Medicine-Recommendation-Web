@@ -50,6 +50,8 @@
         padding: 5px 10px;
         cursor: pointer;
         border-radius: 5px;
+        position: relative;
+        bottom: 8px;
     }
 
     .delete-ingredient-btn:hover {

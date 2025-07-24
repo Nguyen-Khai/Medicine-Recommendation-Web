@@ -17,6 +17,14 @@ class AdminModel
         $stmt->execute([$username]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+    //Ghi logs
+    public function logAction($adminId, $action, $ipAddress = null, $userAgent = null)
+    {
+        $stmt = $this->pdo->prepare("INSERT INTO admin_logs (admin_id, action, ip_address, user_agent) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$adminId, $action, $ipAddress, $userAgent]);
+    }
+
     //Dashboard
     public function getTotalUsers()
     {
@@ -126,19 +134,6 @@ class AdminModel
         $stmt->execute([$id]);
     }
 
-    public function logAction($adminId, $action)
-    {
-        global $pdo;
-        $stmt = $pdo->prepare("INSERT INTO admin_logs (admin_id, action, ip_address, user_agent)
-                           VALUES (:admin_id, :action, :ip, :agent)");
-        return $stmt->execute([
-            ':admin_id' => $adminId,
-            ':action' => $action,
-            ':ip' => $_SERVER['REMOTE_ADDR'],
-            ':agent' => $_SERVER['HTTP_USER_AGENT']
-        ]);
-    }
-
     public function searchAndFilter($search = '', $role = '')
     {
         $sql = "SELECT * FROM admins WHERE 1";
@@ -163,10 +158,10 @@ class AdminModel
     public function getAllFeedbacks()
     {
         $stmt = $this->pdo->query("
-        SELECT feedback.*, users.username 
+        SELECT DISTINCT feedback.id, feedback.message, feedback.created_at, feedback.is_read, users.username, users.email
         FROM feedback 
         LEFT JOIN users ON feedback.user_id = users.id 
-        ORDER BY created_at DESC
+        ORDER BY feedback.created_at DESC
     ");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -181,6 +176,43 @@ class AdminModel
     {
         $stmt = $this->pdo->prepare("DELETE FROM feedback WHERE id = ?");
         return $stmt->execute([$id]);
+    }
+
+    public function getFilteredFeedbacks($search = '', $status = '')
+    {
+        $query = "SELECT * FROM feedback WHERE 1";
+
+        $params = [];
+
+        if (!empty($search)) {
+            $query .= " AND (email LIKE :search OR user_id LIKE :search)";
+            $params[':search'] = '%' . $search . '%';
+        }
+
+        if (!empty($status)) {
+            if ($status === 'read') {
+                $query .= " AND is_read = 1";
+            } elseif ($status === 'unread') {
+                $query .= " AND is_read = 0";
+            } elseif ($status === 'replied') {
+                $query .= " AND id IN (SELECT feedback_id FROM feedback_replies)";
+            } elseif ($status === 'unreplied') {
+                $query .= " AND id NOT IN (SELECT feedback_id FROM feedback_replies)";
+            }
+        }
+
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
+    //Admin logs
+    public function getLogsByAdminId($adminId)
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM admin_logs WHERE admin_id = :admin_id ORDER BY created_at DESC LIMIT 100");
+        $stmt->execute(['admin_id' => $adminId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     //Users
@@ -701,5 +733,54 @@ class AdminModel
         // Cuối cùng, xóa bệnh khỏi bảng diseases
         $stmt = $this->pdo->prepare("DELETE FROM diseases WHERE id = :id");
         $stmt->execute(['id' => $id]);
+    }
+
+    //Setting
+    public function updateAdminInfo($id, $name, $email)
+    {
+        $stmt = $this->pdo->prepare("UPDATE admins SET name = ?, email = ? WHERE id = ?");
+        return $stmt->execute([$name, $email, $id]);
+    }
+
+    public function updatePassword($adminId, $hashedPassword)
+    {
+        $stmt = $this->pdo->prepare("UPDATE admins SET password = :password WHERE id = :id");
+        return $stmt->execute([
+            ':password' => $hashedPassword,
+            ':id' => $adminId
+        ]);
+    }
+
+    public function updateAvatar($id, $data, $mimeType)
+    {
+        $stmt = $this->pdo->prepare("UPDATE admins SET avatar = ?, avatar_type = ? WHERE id = ?");
+        return $stmt->execute([$data, $mimeType, $id]);
+    }
+
+
+    public function setTheme($id, $theme)
+    {
+        $stmt = $this->pdo->prepare("UPDATE admins SET theme = ? WHERE id = ?");
+        return $stmt->execute([$theme, $id]);
+    }
+
+    //Feedbacks
+    public function getFeedbackById($id)
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM feedback WHERE id = ?");
+        $stmt->execute([$id]);
+        return $stmt->fetch();
+    }
+
+    public function storeFeedbackReply($feedback_id, $message)
+    {
+        $stmt = $this->pdo->prepare("INSERT INTO feedback_replies (feedback_id, reply_message, replied_at) VALUES (?, ?, NOW())");
+        $stmt->execute([$feedback_id, $message]);
+    }
+    public function hasReplied($feedbackId)
+    {
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM feedback_replies WHERE feedback_id = ?");
+        $stmt->execute([$feedbackId]);
+        return $stmt->fetchColumn() > 0;
     }
 }

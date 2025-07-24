@@ -173,7 +173,6 @@ class DiseaseModel
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-
     // Lưu lịch sử người dùng
     public function saveUserHistory(array $data)
     {
@@ -201,12 +200,34 @@ class DiseaseModel
     }
 
     // Hiển thị chi tiết lịch sử người dùng
-    public function getUserHistory($userId)
+    public function getUserHistory($userId, $search = '')
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM user_history WHERE user_id = ? ORDER BY created_at DESC");
-        $stmt->execute([$userId]);
+        $sql = "
+        SELECT uh.*,
+               EXISTS (
+                   SELECT 1 FROM feedback f WHERE f.history_id = uh.id
+               ) AS has_feedback
+        FROM user_history uh
+        WHERE uh.user_id = :userId
+    ";
+
+        if (!empty($search)) {
+            $sql .= " AND (uh.symptoms LIKE :search OR uh.	predicted_disease LIKE :search)";
+        }
+
+        $sql .= " ORDER BY uh.created_at DESC";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':userId', $userId, PDO::PARAM_INT);
+
+        if (!empty($search)) {
+            $stmt->bindValue(':search', '%' . $search . '%', PDO::PARAM_STR);
+        }
+
+        $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
 
     //Lưu lịch sử tìm kiếm
     public function saveSearchHistory($userId, $keyword)
@@ -260,5 +281,20 @@ class DiseaseModel
     {
         $stmt = $this->pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
         return $stmt->execute([$newHashedPassword, $userId]);
+    }
+
+    //Feedbacks
+    public function saveFeedback($userId, $email, $message, $historyId)
+    {
+        $stmt = $this->pdo->prepare("INSERT INTO feedback (user_id, email, message, history_id, created_at, is_read)
+                           VALUES (?, ?, ?, ?, NOW(), 0)");
+        $stmt->execute([$userId, $email, $message, $historyId]);
+    }
+    public function getFeedbackByHistoryId($historyId)
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM feedback WHERE history_id = ?");
+        $stmt->execute([$historyId]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result ? $result : null;
     }
 }

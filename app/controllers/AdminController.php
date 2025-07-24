@@ -10,6 +10,19 @@ class AdminController
         include '../app/views/admin/login.php';
     }
 
+    private function logAction($action)
+    {
+        require_once '../app/models/AdminModel.php';
+        $model = new AdminModel();
+
+        if (isset($_SESSION['admin'])) {
+            $adminId = $_SESSION['admin']['id'];
+            $ip = $_SERVER['REMOTE_ADDR'] ?? null;
+            $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? null;
+            $model->logAction($adminId, $action, $ip, $userAgent);
+        }
+    }
+
     public function handleLogin()
     {
         global $pdo;
@@ -29,10 +42,11 @@ class AdminController
                     'id' => $admin['id'],
                     'username' => $admin['username'],
                     'role' => $admin['role'],
+                    'name' => $admin['name'],
                     'email' => $admin['email'],
-                    'avatar' => $admin['avatar'] ?? null,
+                    'avatar' => $admin['avatar'] ?? 'assets/images/default_avatar.png',
                 ];
-
+                $this->logAction("Login successful");
                 header("Location: index.php?route=admin-dashboard");
                 exit();
             } else {
@@ -45,6 +59,7 @@ class AdminController
 
     public function logout()
     {
+        $this->logAction("Logged out");
         session_unset();        // Xóa tất cả biến phiên
         session_destroy();      // Hủy session
         header('Location: index.php?route=admin-login');
@@ -210,7 +225,7 @@ class AdminController
             $_SESSION['admin_message'] = "Please fill in all required information.";
             $_SESSION['admin_message_type'] = "error";
         }
-
+        $this->logAction("Added user ID {$id}");
         header("Location: index.php?route=add-admin");
         exit;
     }
@@ -246,6 +261,7 @@ class AdminController
         $adminModel = new AdminModel();
         $admin = $adminModel->getAdminById($id);
 
+
         // Kiểm tra phân quyền: chỉ superadmin và manager được sửa, không cho sửa superadmin nếu không phải superadmin
         $currentRole = $_SESSION['admin']['role'];
         if (!$admin || ($admin['role'] === 'superadmin' && $currentRole !== 'superadmin')) {
@@ -264,6 +280,7 @@ class AdminController
             }
 
             $adminModel->updateAdmin($id, $username, $email, $role);
+            $this->logAction("Updated admin ID {$id}");
             header('Location: index.php?route=admins');
             exit;
         }
@@ -286,7 +303,7 @@ class AdminController
         if ($_SESSION['admin']['role'] === 'superadmin' && $admin && $admin['role'] !== 'superadmin') {
             $adminModel->deleteAdmin($id);
         }
-
+        $this->logAction("Deleted user ID {$id}");
         header('Location: index.php?route=admins');
         exit;
     }
@@ -296,7 +313,35 @@ class AdminController
     {
         require_once '../app/models/AdminModel.php';
         $model = new AdminModel();
-        $feedbacks = $model->getAllFeedbacks();
+
+        $search = $_GET['search'] ?? '';
+        $status = $_GET['status'] ?? '';
+        $reply = $_GET['reply'] ?? '';
+
+        $feedbacks = $model->getFilteredFeedbacks($search, $status);
+
+        // Lọc trùng ID feedback
+        $seen = [];
+        $unique_feedbacks = [];
+        foreach ($feedbacks as $f) {
+            if (!in_array($f['id'], $seen)) {
+                $seen[] = $f['id'];
+                $unique_feedbacks[] = $f;
+            }
+        }
+        $feedbacks = $unique_feedbacks;
+
+        // Đánh dấu đã trả lời
+        foreach ($feedbacks as $key => $f) {
+            $feedbacks[$key]['has_replied'] = $model->hasReplied($f['id']);
+        }
+
+        // Lọc theo phản hồi
+        if ($reply === 'replied') {
+            $feedbacks = array_filter($feedbacks, fn($f) => $f['has_replied']);
+        } elseif ($reply === 'not_replied') {
+            $feedbacks = array_filter($feedbacks, fn($f) => !$f['has_replied']);
+        }
 
         $title = "User Feedback";
         ob_start();
@@ -308,6 +353,56 @@ class AdminController
         } else {
             require '../app/views/admin/home.php';
         }
+    }
+
+    //Phản hồi feedback
+    public function replyFeedback($id)
+    {
+        if (!$id) {
+            echo "Thiếu ID phản hồi";
+            return;
+        }
+
+        $model = new AdminModel();
+        $feedback = $model->getFeedbackById($id);
+
+        if (!$feedback) {
+            echo "Không tìm thấy phản hồi";
+            return;
+        }
+
+        include '../app/views/admin/reply_feedback.php';
+    }
+
+    public function sendFeedbackReply($id)
+    {
+        if (!$id || $_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header("Location: index.php?route=feedbacks");
+            return;
+        }
+
+        $replyMessage = trim($_POST['reply_message'] ?? '');
+
+        if ($replyMessage === '') {
+            echo "Vui lòng nhập nội dung phản hồi.";
+            return;
+        }
+
+        $model = new AdminModel();
+        $feedback = $model->getFeedbackById($id);
+
+        if (!$feedback) {
+            echo "Phản hồi không tồn tại.";
+            return;
+        }
+
+        // Gửi email ở đây hoặc lưu lại
+        // Gợi ý: dùng PHPMailer nếu cần gửi mail
+
+        $model->storeFeedbackReply($id, $replyMessage); // nếu có lưu vào DB
+
+        header("Location: index.php?route=feedbacks&status=success&message=Phản hồi đã được gửi");
+        exit;
     }
 
     //Diagnosis
@@ -419,6 +514,7 @@ class AdminController
         $url = $_POST['url'];
         $activeIngredients = $_POST['active_ingredients'];
         $concentrations = $_POST['concentrations'];
+        $this->logAction("Updated drug ID {$id}");
 
         $this->model->updateDrug($id, $tenThuoc, $dangBaoChe, $soDangKy, $quyCach, $hanSuDung, $url, $activeIngredients, $concentrations);
 
@@ -439,6 +535,7 @@ class AdminController
         }
 
         $success = $this->model->deleteDrugById($id);
+        $this->logAction("Deleted drug ID {$id}");
 
         if ($success) {
             header('Location: index.php?route=admin-drugs&status=deleted');
@@ -519,7 +616,7 @@ class AdminController
                 }
             }
         }
-
+        $this->logAction("Added drug ID {$drugId}");
         $_SESSION['success'] = 'The drug has been added successfully.';
         header('Location: index.php?route=admin-drugs');
         exit;
@@ -591,6 +688,7 @@ class AdminController
             $model->addWorkouts($diseaseId, $workouts);
 
             // Redirect hoặc hiển thị thông báo
+            $this->logAction("Added disease ID {$diseaseId}");
             header('Location: index.php?route=admin-diseases&success=1');
             exit;
         } else {
@@ -634,6 +732,8 @@ class AdminController
         ];
 
         $this->model->updateDisease($id, $data);
+        $this->logAction("Updated disease ID {$id}");
+
 
         header('Location: index.php?route=admin-diseases');
     }
@@ -644,42 +744,174 @@ class AdminController
             die("Unauthorized");
         }
         $this->model->deleteDisease($id);
+        $this->logAction("Deleted disease ID {$id}");
+
         header('Location: index.php?route=admin-diseases');
     }
 
     // Settings
-    public function updatePassword()
+    public function index()
     {
-        if (!isset($_SESSION['admin'])) {
-            header('Location: index.php?route=admin-login');
-            exit;
+        // Bảo vệ truy cập nếu chưa đăng nhập
+        if (!isset($_SESSION['admin']['id'])) {
+            header("Location: index.php?route=admin-login");
+            exit();
         }
 
-        $currentPassword = $_POST['current_password'] ?? '';
-        $newPassword = $_POST['new_password'] ?? '';
-        $confirmPassword = $_POST['confirm_password'] ?? '';
+        // Lấy dữ liệu admin từ session
+        $admin = $_SESSION['admin'];
 
-        if ($newPassword !== $confirmPassword) {
-            $_SESSION['flash_error'] = "New passwords do not match.";
-            header('Location: index.php?route=admin-settings');
-            exit;
+        // Hoặc nếu bạn muốn lấy lại từ DB để đảm bảo mới nhất:
+        require_once '../app/models/AdminModel.php';
+        $model = new AdminModel();
+        $admin = $model->getAdminById($admin['id']);
+
+        // Truyền sang view
+        require_once '../app/views/admin/admin-settings.php';
+    }
+
+    public function editInfo()
+    {
+        require_once '../app/models/AdminModel.php';
+        $model = new AdminModel();
+
+        if (!isset($_SESSION['admin']['id'])) {
+            header("Location: index.php?route=admin-login");
+            exit();
         }
 
-        $stmt = $this->pdo->prepare("SELECT * FROM admins WHERE id = ?");
-        $stmt->execute([$_SESSION['admin']['id']]);
-        $admin = $stmt->fetch();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $adminId = $_SESSION['admin']['id'];
+            $name = trim($_POST['name']);
+            $email = trim($_POST['email']);
 
-        if (!$admin || !password_verify($currentPassword, $admin['password'])) {
-            $_SESSION['flash_error'] = "Current password is incorrect.";
-            header('Location: index.php?route=admin-settings');
-            exit;
+            if ($name !== $_SESSION['admin']['name'] || $email !== $_SESSION['admin']['email']) {
+                $model->updateAdminInfo($adminId, $name, $email);
+
+                // Cập nhật lại session
+                $_SESSION['admin']['name'] = $name;
+                $_SESSION['admin']['email'] = $email;
+
+                $_SESSION['admin_success'] = "Updated successfully!";
+            } else {
+                $_SESSION['admin_info'] = "No changes detected.";
+            }
+        }
+        $this->logAction("Updated profile information");
+
+        // Quay lại trang settings sau khi xử lý
+        header("Location: index.php?route=admin-settings&tab=personal-info");
+        exit();
+    }
+
+    public function changePassword()
+    {
+        // Check if the admin is logged in
+        if (!isset($_SESSION['admin']['id'])) {
+            header("Location: index.php?route=admin-login");
+            exit();
         }
 
-        $newHash = password_hash($newPassword, PASSWORD_DEFAULT);
-        $update = $this->pdo->prepare("UPDATE admins SET password = ? WHERE id = ?");
-        $update->execute([$newHash, $_SESSION['admin']['id']]);
+        // Check if the form sent 'current_password'
+        if (!isset($_POST['current_password'])) {
+            echo "Form did not submit current_password";
+            exit();
+        }
 
-        $_SESSION['flash_success'] = "Password updated successfully.";
-        header('Location: index.php?route=admin-settings');
+        $current = $_POST['current_password'] ?? '';
+        $new = $_POST['new_password'] ?? '';
+        $confirm = $_POST['confirm_password'] ?? '';
+
+        // Check if the new passwords match
+        if ($new !== $confirm) {
+            $_SESSION['password_error'] = "New passwords do not match.";
+            header("Location: index.php?route=admin-settings&tab=password");
+            exit();
+        }
+
+        require_once '../app/models/AdminModel.php';
+        $model = new AdminModel();
+        $adminId = $_SESSION['admin']['id'];
+        $admin = $model->getAdminById($adminId);
+
+        // Verify current password
+        if (!$admin || !password_verify($current, $admin['password'])) {
+            $_SESSION['password_error'] = "Current password is incorrect.";
+            header("Location: index.php?route=admin-settings&tab=password");
+            exit();
+        }
+
+        // Hash and update new password
+        $hashedPassword = password_hash($new, PASSWORD_DEFAULT);
+        $updated = $model->updatePassword($adminId, $hashedPassword);
+
+        // Set success or error message
+        if ($updated) {
+            $_SESSION['password_success'] = "Password has been updated.";
+        } else {
+            $_SESSION['password_error'] = "An error occurred while updating the password.";
+        }
+        $this->logAction("Changed password");
+
+        header("Location: index.php?route=admin-settings&tab=password");
+        exit();
+    }
+
+    public function uploadAvatar()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['avatar'])) {
+            $file = $_FILES['avatar'];
+
+            if ($file['error'] === UPLOAD_ERR_OK) {
+                $fileData = file_get_contents($file['tmp_name']);
+                $mimeType = mime_content_type($file['tmp_name']);
+
+                $model = new AdminModel();
+                $adminId = $_SESSION['admin']['id'];
+                $model->updateAvatar($adminId, $fileData, $mimeType);
+
+                $_SESSION['success'] = "Avatar đã được cập nhật thành công!";
+                header("Location: index.php?route=admin-settings&tab=avatar");
+                exit();
+            } else {
+                $_SESSION['error'] = "Không thể upload ảnh.";
+            }
+        }
+        $this->logAction("Updated avatar");
+
+        header("Location: index.php?route=admin-settings&tab=avatar");
+        exit();
+    }
+
+    public function updateLanguage()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['language'])) {
+            $lang = $_POST['language'];
+
+            if (in_array($lang, ['en', 'vi'])) {
+                $_SESSION['admin']['language'] = $lang;
+
+                // Optional: Lưu vào database nếu cần
+                // $adminId = $_SESSION['admin']['id'];
+                // (new AdminModel())->updateLanguage($adminId, $lang);
+            }
+        }
+
+        header("Location: index.php?route=admin-settings&tab=language");
+        exit();
+    }
+
+    public function showSettings()
+    {
+        require_once '../app/models/AdminModel.php';
+        $logModel = new AdminModel();
+        $adminId = $_SESSION['admin']['id'];
+        $logs = $logModel->getLogsByAdminId($adminId);
+
+        $title = "Admin Settings";
+        ob_start();
+        require '../app/views/admin/settings.php';
+        $content = ob_get_clean();
+        require '../app/views/admin/home.php'; // hoặc layout chính
     }
 }

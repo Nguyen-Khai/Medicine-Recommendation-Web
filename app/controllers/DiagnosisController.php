@@ -103,15 +103,22 @@ class DiseaseController
     public function profile()
     {
         $userId = $_SESSION['user']['id'] ?? null;
+        $search = $_GET['search'] ?? ''; // 👈 Lấy từ khóa tìm kiếm
 
         if (!$userId) {
             header("Location: index.php?route=login");
             exit();
         }
 
-        $userHistories = $this->model->getUserHistory($userId);
+        // 👇 Truyền từ khóa vào model
+        $userHistories = $this->model->getUserHistory($userId, $search);
         $searchHistories = $this->model->getUserSearchHistory($userId);
         $userInfo = $this->model->getUserById($userId);
+
+        foreach ($userHistories as &$record) {
+            $feedback = $this->model->getFeedbackByHistoryId($record['id']);
+            $record['has_feedback'] = $feedback !== null;
+        }
 
         require '../app/views/auth/profile.php';
     }
@@ -209,5 +216,68 @@ class DiseaseController
 
         header('Location: index.php?route=profile#profile');
         exit();
+    }
+
+    //Feedbacks
+    public function feedback()
+    {
+        $userId = $_SESSION['user']['id'] ?? null;
+
+        if (!$userId) {
+            header("Location: index.php?route=login");
+            exit();
+        }
+
+        $userInfo = $this->model->getUserById($userId);
+        include '../app/views/auth/feedback.php';
+    }
+
+    public function handleFeedback()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $message = trim($_POST['message'] ?? '');
+            $email = trim($_POST['email'] ?? '');
+            $user_id = $_SESSION['user']['id'] ?? null;
+            $history_id = $_POST['history_id'] ?? null; // Lấy history_id từ form
+
+            if ($message !== '' && $history_id) {
+                require_once '../app/models/DiseaseModel.php';
+                $model = new DiseaseModel();
+                $model->saveFeedback($user_id, $email, $message, $history_id); // Truyền thêm
+
+                $_SESSION['feedback_info'] = [
+                    'message' => $message,
+                    'created_at' => date('Y-m-d H:i:s')
+                ];
+
+                header("Location: index.php?route=feedback&success=1");
+                exit();
+            } else {
+                header("Location: index.php?route=feedback&error=1");
+                exit();
+            }
+        }
+    }
+
+    public function viewFeedback()
+    {
+        if (!isset($_GET['id'])) {
+            echo "Thiếu ID lịch sử";
+            return;
+        }
+
+        $historyId = $_GET['id'];
+
+        require_once '../app/models/DiseaseModel.php';
+        $this->model = new DiseaseModel();
+
+        $feedback = $this->model->getFeedbackByHistoryId($historyId);
+
+        if (!$feedback) {
+            echo "Không tìm thấy phản hồi.";
+            return;
+        }
+
+        require_once '../app/views/auth/view_feedback.php';
     }
 }

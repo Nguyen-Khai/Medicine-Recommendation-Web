@@ -1,16 +1,16 @@
 <form method="GET" action="index.php" class="admin-filter-form">
     <input type="hidden" name="route" value="admins">
 
-    <input type="text" name="search" placeholder="Tìm username..." value="<?= htmlspecialchars($_GET['search'] ?? '') ?>">
+    <input type="text" name="search" placeholder="Search by username..." value="<?= htmlspecialchars($_GET['search'] ?? '') ?>">
 
     <select name="role">
-        <option value="">Tất cả vai trò</option>
+        <option value="">All roles</option>
         <option value="superadmin" <?= ($_GET['role'] ?? '') === 'superadmin' ? 'selected' : '' ?>>Superadmin</option>
         <option value="manager" <?= ($_GET['role'] ?? '') === 'manager' ? 'selected' : '' ?>>Manager</option>
         <option value="staff" <?= ($_GET['role'] ?? '') === 'staff' ? 'selected' : '' ?>>Staff</option>
     </select>
 
-    <button type="submit">Lọc</button>
+    <button type="submit">Filter</button>
 </form>
 
 <table class="admin-table">

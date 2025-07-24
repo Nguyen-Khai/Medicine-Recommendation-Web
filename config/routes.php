@@ -33,16 +33,22 @@ switch ($route) {
     case 'admin-dashboard':
         $adminController->dashboard($isPartial);
         break;
-
     case 'admin-settings':
-        include '../app/views/admin/settings.php';
+        $adminController->index();
+        break;
+    case 'admin-settings/edit-info':
+        $adminController->editInfo();
+        break;
+    case 'admin-settings/change-password':
+        $adminController->changePassword();
+        break;
+    case 'admin-settings/upload-avatar':
+        $adminController->uploadAvatar();
+        break;
+    case 'admin-settings/language':
+        $adminController->updateLanguage();
         break;
 
-    case 'admin-update-password':
-        require_once '../app/controllers/AdminController.php';
-        $settingsController = new AdminController($pdo);
-        $settingsController->updatePassword();
-        break;
 
     /** ========== ADMIN MANAGEMENT ========== **/
     case 'admins':
@@ -161,6 +167,15 @@ switch ($route) {
         $model->deleteFeedback($_GET['id']);
         header("Location: index.php?route=feedbacks");
         break;
+
+    case 'reply-feedback':
+        $adminController->replyFeedback($_GET['id'] ?? null);
+        break;
+
+    case 'send-feedback-reply':
+        $adminController->sendFeedbackReply($_GET['id'] ?? null);
+        break;
+
     // Người dùng
     case 'home':
         include '../app/views/auth/home.php';
@@ -257,7 +272,16 @@ switch ($route) {
     case 'search':
         $diseaseController->search();
         break;
+    case 'feedback':
+        $diseaseController->feedback();
+        break;
+    case 'handle-feedback':
+        $diseaseController->handleFeedback();
+        break;
 
+    case 'view-feedback':
+        $diseaseController->viewFeedback();
+        break;
     default:
         echo "404 - Không tìm thấy đường dẫn.";
         break;
