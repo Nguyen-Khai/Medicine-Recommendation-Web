@@ -237,10 +237,26 @@ class DiseaseModel
     }
 
     //Hiển thị lịch sử tìm kiếm
-    public function getUserSearchHistory($userId)
+    public function getUserSearchHistory($userId, $search = '')
     {
-        $stmt = $this->pdo->prepare("SELECT keyword, created_at FROM search_history WHERE user_id = ? ORDER BY created_at DESC");
-        $stmt->execute([$userId]);
+        $sql = "SELECT keyword, created_at 
+            FROM search_history 
+            WHERE user_id = :userId";
+
+        if (!empty($search)) {
+            $sql .= " AND keyword LIKE :search";
+        }
+
+        $sql .= " ORDER BY created_at DESC";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':userId', $userId, PDO::PARAM_INT);
+
+        if (!empty($search)) {
+            $stmt->bindValue(':search', '%' . $search . '%', PDO::PARAM_STR);
+        }
+
+        $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -296,5 +312,13 @@ class DiseaseModel
         $stmt->execute([$historyId]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return $result ? $result : null;
+    }
+
+    public function getAdminReplyByFeedbackId($feedbackId)
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM feedback_replies WHERE feedback_id = ?");
+        $stmt->execute([$feedbackId]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result ?: null;
     }
 }

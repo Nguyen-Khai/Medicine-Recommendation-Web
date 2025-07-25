@@ -103,16 +103,17 @@ class DiseaseController
     public function profile()
     {
         $userId = $_SESSION['user']['id'] ?? null;
-        $search = $_GET['search'] ?? ''; // 👈 Lấy từ khóa tìm kiếm
+        $search = $_GET['search'] ?? ''; // 👈 Tìm kiếm tư vấn
+        $searchHistory = $_GET['search_history'] ?? ''; // 👈 Tìm kiếm trong lịch sử tìm kiếm
 
         if (!$userId) {
             header("Location: index.php?route=login");
             exit();
         }
 
-        // 👇 Truyền từ khóa vào model
+        // Truyền cả 2 từ khóa vào model
         $userHistories = $this->model->getUserHistory($userId, $search);
-        $searchHistories = $this->model->getUserSearchHistory($userId);
+        $searchHistories = $this->model->getUserSearchHistory($userId, $searchHistory);
         $userInfo = $this->model->getUserById($userId);
 
         foreach ($userHistories as &$record) {
@@ -271,12 +272,14 @@ class DiseaseController
         require_once '../app/models/DiseaseModel.php';
         $this->model = new DiseaseModel();
 
-        $feedback = $this->model->getFeedbackByHistoryId($historyId);
+        $feedback = $this->model->getFeedbackByHistoryId(historyId: $historyId);
 
         if (!$feedback) {
             echo "Không tìm thấy phản hồi.";
             return;
         }
+        // Lấy phản hồi từ admin nếu có
+        $reply = $this->model->getAdminReplyByFeedbackId($feedback['id']);
 
         require_once '../app/views/auth/view_feedback.php';
     }

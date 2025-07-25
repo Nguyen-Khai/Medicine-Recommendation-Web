@@ -174,7 +174,7 @@
             font-size: 18px;
             cursor: pointer;
             position: relative;
-            top: 30px;
+            top: 10px;
         }
 
         button.button_register {
@@ -413,10 +413,6 @@
                         <span type="button" class="toggle-password" onclick="togglePassword('login-password', this)">
                             <img src="assets/images/close eye.png" alt="Hiện mật khẩu" class="eye-icon" />
                         </span>
-                    </div>
-                    <div class="remember-me">
-                        <input type="checkbox" id="remember" name="remember" />
-                        <label class="remember" for="remember">Remember Password</label>
                     </div>
                     <button>Login</button>
                 </form>

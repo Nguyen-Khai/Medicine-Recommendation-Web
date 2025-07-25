@@ -617,11 +617,11 @@ $base64 = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'default
                 <h2>Search history</h2>
 
                 <div class="input-with-icon">
-                    <input type="text" id="search-filter" placeholder="Tìm kiếm trong lịch sử tìm kiếm...">
-                    <svg class="icon-search" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1110.5 3a7.5 7.5 0 016.15 13.65z" />
-                    </svg>
+                    <form method="GET" action="index.php?route=profile#search-history" class="search-form">
+                        <input type="hidden" name="route" value="profile">
+                        <input type="text" id="search-filter" name="search_history" placeholder="Search in search history..." value="<?= htmlspecialchars($_GET['search_history'] ?? '') ?>">
+                        <button type="submit">🔍 Search</button>
+                    </form>
                 </div>
 
                 <ul id="search-history-list">
@@ -642,8 +642,8 @@ $base64 = $avatar ? 'data:image/png;base64,' . base64_encode($avatar) : 'default
                 <div class="input-with-icon">
                     <form method="GET" action="index.php?route=profile#advice-history" class="search-form">
                         <input type="hidden" name="route" value="profile">
-                        <input type="text" name="search" placeholder="Tìm kiếm trong lịch sử tư vấn..." value="<?= htmlspecialchars($_GET['search'] ?? '') ?>">
-                        <button type="submit">🔍 Tìm</button>
+                        <input type="text" id="search-filter" name="search" placeholder="Search in consultation history..." value="<?= htmlspecialchars($_GET['search'] ?? '') ?>">
+                        <button type="submit">🔍 Search</button>
                     </form>
                 </div>
                 <?php if (!empty($userHistories)): ?>

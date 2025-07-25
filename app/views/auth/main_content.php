@@ -128,66 +128,6 @@
         left: 80%;
     }
 
-    /*section 2*/
-    .section.section2 {
-        width: 100vw;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: left;
-    }
-
-    .st2-title {
-        text-align: center;
-        font-size: 28px;
-        color: #d9534f;
-        margin-bottom: 0px;
-        margin-top: 140px;
-    }
-
-    .health-article {
-        background-color: #fff;
-        border-left: 5px solid #d9534f;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-        padding: 20px;
-        margin-bottom: 30px;
-        border-radius: 8px;
-        transition: transform 0.3s;
-    }
-
-    .health-article:hover {
-        transform: translateY(-4px);
-    }
-
-    .health-article a {
-        text-decoration: none;
-    }
-
-    .article-title {
-        font-size: 20px;
-        color: #333;
-        margin-bottom: 10px;
-        text-decoration: none;
-    }
-
-    .article-title:hover {
-        text-decoration: underline;
-        color: #c9302c;
-    }
-
-    .article-description {
-        font-size: 16px;
-        color: #555;
-        margin-bottom: 10px;
-    }
-
-    .article-meta {
-        font-size: 14px;
-        color: #888;
-    }
-
     /*section 3*/
     .ai-assistant-section {
         background: #f0f9ff;
@@ -381,34 +321,6 @@
         <div class="circle circle3"></div>
         <div class="circle circle4"></div>
     </div>
-    <div class="section section2">
-        <div class="container st2">
-            <h2 class="st2-title"> Health Knownledge</h2>
-            <div class="health-article">
-                <a href="https://vnexpress.net/cach-cham-soc-nguoi-cao-tuoi-tai-nha-123456.html" target="_blank" rel="noopener noreferrer">
-                    <h3 class="article-title">Tác động của giấc ngủ đến sức khỏe tinh thần</h3>
-                </a>
-                <p class="article-description">
-                    Nghiên cứu mới cho thấy rằng ngủ đủ 7–9 giờ mỗi đêm giúp cải thiện trí nhớ, giảm căng thẳng và ngăn ngừa trầm cảm.
-                </p>
-                <p class="article-meta">
-                    ✍️ <strong>Tác giả:</strong> Minh An &nbsp; | &nbsp; 📅 <strong>Ngày:</strong> 08/06/2025 &nbsp; | &nbsp; 🏷️ <strong>Thể loại:</strong> Sức khỏe tinh thần
-                </p>
-            </div>
-
-            <div class="health-article">
-                <a href="https://tuoitre.vn/dinh-duong-cho-benh-tieu-duong-654321.html" target="_blank" rel="noopener noreferrer">
-                    <h3 class="article-title">Bí quyết ăn uống giúp phòng ngừa tiểu đường type 2</h3>
-                </a>
-                <p class="article-description">
-                    Chuyên gia khuyến nghị ăn nhiều rau xanh, ngũ cốc nguyên hạt và hạn chế đường tinh luyện để kiểm soát lượng đường huyết.
-                </p>
-                <p class="article-meta">
-                    ✍️ <strong>Tác giả:</strong> Lan Hương &nbsp; | &nbsp; 📅 <strong>Ngày:</strong> 07/06/2025 &nbsp; | &nbsp; 🏷️ <strong>Thể loại:</strong> Dinh dưỡng
-                </p>
-            </div>
-        </div>
-    </div>
     <div class="section section3">
         <h2 class="st3">My health assistant</h2>
         <p class="st3">ask me anything about health, medicine,...</p>
@@ -457,40 +369,57 @@
     });
 
     /*chatbox*/
-    function sendMessage(event) {
+    async function sendMessage(event) {
         event.preventDefault();
+
         const input = document.getElementById("user-input");
         const message = input.value.trim();
         if (!message) return;
 
-        appendMessage("Bạn", message, "user");
+        addMessage("user", message);
         input.value = "";
 
-        // Bot response (giản lược)
-        setTimeout(() => {
-            const reply = getBotResponse(message);
-            appendMessage("Trợ lý", reply, "bot");
-        }, 500);
+        addMessage("bot", "Đang trả lời...");
+
+        const chatMessages = document.getElementById("chat-messages");
+
+        try {
+            const res = await fetch("index.php?route=chatbot", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    message
+                })
+            })
+
+            console.log("Dữ liệu trả về từ ChatGPT:", data);
+
+            const data = await res.json();
+            const reply = data.choices?.[0]?.message?.content || "Không nhận được phản hồi từ trợ lý.";
+
+            // Xóa tin nhắn "Đang trả lời..."
+            chatMessages.removeChild(chatMessages.lastChild);
+            addMessage("bot", reply.trim());
+        } catch (error) {
+            console.error(error);
+            chatMessages.removeChild(chatMessages.lastChild);
+            addMessage("bot", "Lỗi hệ thống. Vui lòng thử lại sau.");
+        }
     }
 
-    function appendMessage(sender, message, type) {
+    function addMessage(sender, text) {
         const chatMessages = document.getElementById("chat-messages");
-        const msg = document.createElement("p");
-        msg.classList.add(type);
-        msg.innerHTML = `<strong>${sender}:</strong> ${message}`;
-        chatMessages.appendChild(msg);
+        const messageDiv = document.createElement("div");
+        messageDiv.classList.add("message", sender);
+        messageDiv.innerText = text;
+        chatMessages.appendChild(messageDiv);
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    function getBotResponse(userInput) {
-        const text = userInput.toLowerCase();
-        if (text.includes("uống thuốc")) return "Tôi sẽ nhắc bạn uống thuốc đúng giờ!";
-        if (text.includes("huyết áp")) return "Hãy đo huyết áp thường xuyên và ghi lại chỉ số.";
-        return "Xin lỗi, tôi chưa hiểu rõ. Bạn có thể hỏi về sức khoẻ, thuốc, hoặc chế độ dinh dưỡng.";
-    }
-
     //fade-in
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function() {
         const footer = document.querySelector(".site-footer");
 
         const observer = new IntersectionObserver((entries, observer) => {

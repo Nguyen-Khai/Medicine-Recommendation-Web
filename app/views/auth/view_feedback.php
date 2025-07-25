@@ -109,6 +109,27 @@ $createdAtFormatted = date('H:i d/m/Y', strtotime($feedback['created_at']));
             text-decoration: underline;
             color: #0056b3;
         }
+
+        .admin-reply {
+            margin-top: 30px;
+            background-color: #f1f9ff;
+            border-left: 4px solid #28a745;
+            padding: 16px 20px;
+            border-radius: 8px;
+        }
+
+        .admin-reply h3 {
+            margin-top: 0;
+            color: #28a745;
+            font-size: 18px;
+        }
+
+        .admin-reply p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+            white-space: pre-line;
+        }
     </style>
 </head>
 
@@ -131,6 +152,24 @@ $createdAtFormatted = date('H:i d/m/Y', strtotime($feedback['created_at']));
                 <h3>Feedback Content</h3>
                 <p><?= nl2br(htmlspecialchars($feedback['message'])) ?></p>
             </div>
+
+            <?php if ($reply): ?>
+                <div class="feedback-box" style="margin-top: 30px;">
+                    <div class="feedback-meta">
+                        <div><strong>👩‍⚕️ Admin replied at:</strong> <?= date('H:i d/m/Y', strtotime($reply['replied_at'])) ?></div>
+                    </div>
+
+                    <div class="feedback-message">
+                        <h3>Admin's Reply</h3>
+                        <p><?= nl2br(htmlspecialchars($reply['reply_message'])) ?></p>
+                    </div>
+                </div>
+            <?php else: ?>
+                <div class="feedback-box" style="margin-top: 30px; background: #fffbe6; border: 1px solid #ffe58f;">
+                    <p style="color: #d48806; font-size: 16px;">⚠️ This feedback has not been replied by the admin yet.</p>
+                </div>
+            <?php endif; ?>
+
         </div>
 
         <a href="index.php?route=profile#advice-history" class="back-link">← Back to Consultation History</a>

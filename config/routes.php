@@ -282,6 +282,10 @@ switch ($route) {
     case 'view-feedback':
         $diseaseController->viewFeedback();
         break;
+
+    case 'chatbot':
+        include '../app/controllers/ChatbotController.php'; // 👈 bạn tạo controller này
+        break;
     default:
         echo "404 - Không tìm thấy đường dẫn.";
         break;
